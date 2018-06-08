@@ -5,6 +5,9 @@
 #include <errno.h>
 #include <pthread.h>
 
+#include <sys/types.h> /* getpid */
+#include <unistd.h>
+
 #include "../include/slog.h"
 
 static pthread_rwlock_t lock_env = PTHREAD_RWLOCK_INITIALIZER;
@@ -14,7 +17,7 @@ static pthread_rwlock_t lock_debug = PTHREAD_RWLOCK_INITIALIZER;
 static pthread_key_t slog_thread_key;
 
 static void slog_clean_thread_key() {
-    slog_thread_t *slog_thread = pthread_getspecific(slog_thread_key);
+    slog_thread_t *slog_thread = static_cast<slog_thread_t *>(pthread_getspecific(slog_thread_key));
     if (slog_thread) free(slog_thread);
 }
 
@@ -47,9 +50,9 @@ int slog_init() {
 }
 
 #define fetch_thread_buffer(thread_buffer) do {\
-    (thread_buffer) = pthread_getspecific(slog_thread_key);\
+    (thread_buffer) = (slog_thread_t *)pthread_getspecific(slog_thread_key);\
 	if (!(thread_buffer)) {\
-        (thread_buffer) = calloc(1, sizeof(slog_thread_t));\
+        (thread_buffer) = (slog_thread_t *)calloc(1, sizeof(slog_thread_t));\
 		if (!(thread_buffer)) {\
 			printf("fetch_thread_buffer calloc error\n");\
 		}\
@@ -63,12 +66,12 @@ int slog_init() {
 
 int slog(int level, const char *file, size_t filelen, const char *func,
          size_t funclen, long line, const char *format, ...) {
-    slog_thread_t *thread_buffer;
+    slog_thread_t *thread_buffer = NULL;
     fetch_thread_buffer(thread_buffer);
 
     int ret;
     va_list arg;
-    FILE *log_file_debug, *log_file_info, *log_file_error;
+    FILE *log_file_debug = NULL, *log_file_info = NULL, *log_file_error = NULL;
 
     va_start(arg, format);
     vsnprintf(thread_buffer->msg_buf, LOG_BUFFER_MAX_LENGTH, format, arg);

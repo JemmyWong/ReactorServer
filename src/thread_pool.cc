@@ -24,7 +24,8 @@ threadPool_t *threadPool_init(int number) {
         printf("malloc threadPool_t error: %s\n", strerror(errno));
         slog_error("malloc threadPool_t error: %s", strerror(errno));
 
-        goto FREE_01;
+        free(threadPool);
+        return NULL;
     }
 
     pthread_t *threads = (pthread_t *)malloc(number * sizeof(pthread_t));
@@ -32,7 +33,8 @@ threadPool_t *threadPool_init(int number) {
         printf("malloc pthread_t[] error: %s\n", strerror(errno));
         slog_error("malloc pthread_t[] error: %s", strerror(errno));
 
-        goto FREE_02;
+        free(threadPool);
+        return NULL;
     }
     threadPool->number = number;
     threadPool->threads = threads;
@@ -41,7 +43,9 @@ threadPool_t *threadPool_init(int number) {
         printf("threadPool_jobQueue_init error: %s\n", strerror(errno));
         slog_error("threadPool_jobQueue_init error: %s", strerror(errno));
 
-        goto FREE_02;
+        free(threads);
+        free(threadPool);
+        return NULL;
     }
     threadPool->jobQueue->queueSem = (sem_t *)malloc(sizeof(sem_t));
     sem_init(threadPool->jobQueue->queueSem, 0, 0);
@@ -49,7 +53,7 @@ threadPool_t *threadPool_init(int number) {
 
     int i;
     for (i = 0; i < number; ++i) {
-        pthread_create(&(threads[i]), NULL, (void *)threadPool_job_do, (void *)threadPool);
+        pthread_create(&(threads[i]), NULL, (void* (*)(void*))threadPool_job_do, (void *)threadPool);
     }
     slog_info("threadPool threads creation finished");
 
@@ -60,12 +64,6 @@ threadPool_t *threadPool_init(int number) {
     slog_info("- - - - - - - - - - - - - -  init threadPool end - - - - - - -- - - - - - -\n");
 
     return threadPool;
-
-FREE_02:
-    free(threads);
-FREE_01:
-    free(threadPool);
-    return NULL;
 }
 
 void threadPool_destroy(threadPool_t *threadPool) {

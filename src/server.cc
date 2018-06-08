@@ -11,7 +11,7 @@
 #include "../include/eventhandler.h"
 
 static int pipefd[2];
-static threadPool_t *threadPool;
+static threadPool_t *threadPool = NULL;
 static char configPath[255] = "../config.ini";
 
 int main(int argc, char **argv) {
@@ -32,8 +32,8 @@ int main(int argc, char **argv) {
     strcpy(key, "RLIMIT");
     get_config(configPath, key, value);
     struct rlimit rl;
-    rl.rlim_cur = value;
-    rl.rlim_max = value;
+    rl.rlim_cur = atoi(value);
+    rl.rlim_max = atoi(value);
     setrlimit(RLIMIT_NOFILE, &rl);
     getrlimit(RLIMIT_NOFILE, &rl);
     printf("Linux kernel rlimit, cur: %d, max: %d\n", (int)rl.rlim_cur, (int)rl.rlim_max);

@@ -3,7 +3,7 @@
 2. Support config file
 3. Support log
 4. Support timer
-5. Unified event source: [ I/O Event, Timer Event](src/eventhandler.c), [ Signal Event](src/sig_handler.c)
+5. Unified event source: [I/O Event](src/handler_io.cc), [Signal Event](src/handler_sig.cc), [Timer Event](src/handler_timer.cc)
 
 ## TODO:
 1. - [ ] Higher concurrence
@@ -16,6 +16,8 @@
 8. - [ ] Secure access based on IP and mask
 9. - [ ] When there is no resource to accept a new connection
 10. - [ ] Program safe exit
+11. - [ ] Run in daemon model
+12. - [ ] Rebuild to CC
 
 ## BUG:
 1. - [x] Signal event bug

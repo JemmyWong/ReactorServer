@@ -116,7 +116,7 @@ int event_loop(reactor_t *reactor) {
                     handle_event_msg->eh = eh;
                     handle_event_msg->e = ees[i].events;
 
-                    threadPool_add_work(reactor->threadPool, (void *)eh->handle_event, handle_event_msg);
+                    threadPool_add_work(reactor->threadPool, (void (*)(void*))eh->handle_event, (void *)handle_event_msg);
                 } else {
                     printf("event_loop find_eh eh is NULL\n");
                     slog_error("event_loop find_eh eh is NULL, fd<%d>\n", ees[i].data.fd);
