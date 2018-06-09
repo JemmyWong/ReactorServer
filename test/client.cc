@@ -15,7 +15,7 @@
 static int totalConn = 0;
 
 void *send_sock(void *arg) {
-    int fd = (int)arg;
+    int fd = *(reinterpret_cast<int *>(arg));
     char msg[1024] = "Hi, Server. I'm Client";
     if (send(fd, msg, strlen(msg), 0) == -1) {
         fprintf(stderr, "send_sock errror: %s\n", strerror(errno));
@@ -68,7 +68,7 @@ void *threadMain(void *arg) {
         exit(1);
     }
 
-    start_thread_pool((void *)sockfd);
+    start_thread_pool((void *)&sockfd);
 
     return 0;
 }

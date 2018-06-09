@@ -3,6 +3,7 @@
 #include <sys/resource.h> /* rlimit */
 
 #include "../include/slog.h"
+#include "../include/timer.h"
 #include "../include/server.h"
 #include "../include/reactor.h"
 #include "../include/configUtil.h"
@@ -12,7 +13,7 @@
 
 static int pipefd[2];
 static threadPool_t *threadPool = NULL;
-static char configPath[255] = "../config.ini";
+static char configPath[255] = "../config.conf";
 
 int main(int argc, char **argv) {
     char key[20];
@@ -58,21 +59,23 @@ int main(int argc, char **argv) {
     reactor_t *reactor = create_reactor(epollfd, threadPool);
 
 /* create listen fd event handler */
-    event_handler_t *acceptor = create_listen_handler(listenfd, reactor);
-    if (acceptor == NULL) {
-        fprintf(stderr, "acceptor is NULL\n");
-    }
-    reactor->add_eh(reactor, acceptor);
+    event_handler_t *io_acceptor = create_listen_handler(listenfd, reactor);
+    reactor->add_eh(reactor, io_acceptor);
     slog_info("listen handler create and add to reactor");
     printf("create and add listen fd=%d to reactor, core_idx=%d\n",
-           acceptor->fd, reactor->core->current_idx - 1);
+           io_acceptor->fd, reactor->core->current_idx - 1);
+
+/* create timer event handler*/
+    addTimer(2);
+    event_handler_t *timer_accptor = create_timer_handler(reactor);
+    reactor->add_eh(reactor, timer_accptor);
 
 /* create signal event handler */
     event_handler_t *sig_acceptor = create_signal_handler(reactor, SIGALRM);
     reactor->add_eh(reactor, sig_acceptor);
-    alarm(TIMESLOT);
     printf("create and add signal fd=%d\n to reactor\n", sig_acceptor->fd);
 
+/* start main loop */
     reactor->event_loop(reactor);
 
     return 0;

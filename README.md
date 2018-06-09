@@ -2,7 +2,7 @@
 1. Based on reactor architecture
 2. Support config file
 3. Support log
-4. Support timer
+4. Support timer, based on heap
 5. Unified event source: [I/O Event](src/handler_io.cc), [Signal Event](src/handler_sig.cc), [Timer Event](src/handler_timer.cc)
 
 ## TODO:

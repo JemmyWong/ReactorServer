@@ -10,7 +10,7 @@
 #include "../include/reactor.h"
 #include "../include/configUtil.h"
 
-static char configPath[255] = "../config.ini";
+static char configPath[255] = "../config.conf";
 pthread_mutex_t mutex_eh = PTHREAD_MUTEX_INITIALIZER;
 
 event_handler_t *find_eh(reactor_core_t *core, int fd, int *index) {
@@ -39,7 +39,7 @@ int add_eh(reactor_t *reactor, event_handler_t *eh) {
     int result = 0;
     struct epoll_event ee;
 
-    if (eh->fd < 0 || eh->handle_event == NULL) {
+    if (!eh || eh->fd < 0 || eh->handle_event == NULL) {
         printf("fd < 0 or handle_event is NULL\n");
         result = -1;
     }

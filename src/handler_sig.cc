@@ -1,7 +1,8 @@
 #include "../include/slog.h"
+#include "../include/timer.h"
+#include "../include/server.h"
 #include "../include/header.h"
 #include "../include/reactor.h"
-#include "../include/server.h"
 #include "../include/thread_pool.h"
 #include "../include/global.h"
 
@@ -9,11 +10,13 @@
 
 static int pipefd[2];
 
+extern int timerPipeFd[2];
+
 void sig_handler(int sig) {
-    // TODO why save previous errno?
+    /* save old errno to ensure the function's reentrancy */
     int signal = sig;
     int save_error = errno;
-    send(pipefd[1], &signal, sizeof(sig), 0);
+    send(pipefd[1], &signal, sizeof(sig), 0);   /* send sig to pipe to info main loop */
     errno = save_error;
 }
 
@@ -28,6 +31,7 @@ void sig_handler(int sig) {
  *
  * */
 
+/* register sig with the system */
 void addsig(int sig) {
     struct sigaction sa;
     memset(&sa, '\0', sizeof(sa));
@@ -49,11 +53,14 @@ static void handle_signal_event(handle_event_msg_t *handle_event_msg) {
         fprintf(stderr, "handle_signal_event recv error: %s\n", strerror(errno));
     } else {
         switch (sig) {
-            case SIGALRM:
-//                alarm(TIMESLOT);
+            case SIGALRM: {
                 printf("signal alarm\n");
                 slog_info("handel_signal_event of SIGALRM");
+//                alarm(TIMESLOT);
+                int timer = 1;
+                send(timerPipeFd[1], &timer, sizeof(timer), 0);
                 break;
+            }
             case SIGINT:
                 printf("signal interupt\n");
                 exit(0);
