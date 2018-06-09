@@ -20,6 +20,8 @@ public:
     ConfigFile(string file);
 
     string getValue(string key);
+
+    int setValue(string key, string value);
 private:
     string fileName;
     std::map<string, string> confMap;
