@@ -55,4 +55,6 @@ si/
 
 # CLION
 .idea
+.idea/
 *.idea
+cmake-build-debug/
