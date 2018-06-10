@@ -4,11 +4,11 @@
 #include <stdlib.h>
 #include <sys/epoll.h>
 
-#include "../include/slog.h"
-#include "../include/reactor.h"
-#include "../include/header.h"
-#include "../include/reactor.h"
-#include "../include/configUtil.h"
+#include "slog.h"
+#include "reactor.h"
+#include "header.h"
+#include "reactor.h"
+#include "configUtil.h"
 
 static char configPath[255] = "../config.conf";
 pthread_mutex_t mutex_eh = PTHREAD_MUTEX_INITIALIZER;

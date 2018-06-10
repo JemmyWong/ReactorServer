@@ -2,14 +2,14 @@
 #include <arpa/inet.h>
 #include <sys/resource.h> /* rlimit */
 
-#include "../include/slog.h"
-#include "../include/timer.h"
-#include "../include/server.h"
-#include "../include/reactor.h"
-#include "../include/configUtil.h"
-#include "../include/thread_pool.h"
-#include "../include/sig_handler.h"
-#include "../include/eventhandler.h"
+#include "slog.h"
+#include "timer.h"
+#include "server.h"
+#include "reactor.h"
+#include "configUtil.h"
+#include "thread_pool.h"
+#include "sig_handler.h"
+#include "eventhandler.h"
 
 static int pipefd[2];
 static threadPool_t *threadPool = NULL;
@@ -65,15 +65,15 @@ int main(int argc, char **argv) {
     printf("create and add listen fd=%d to reactor, core_idx=%d\n",
            io_acceptor->fd, reactor->core->current_idx - 1);
 
-/* create timer event handler*/
-    addTimer(2);
-    event_handler_t *timer_accptor = create_timer_handler(reactor);
-    reactor->add_eh(reactor, timer_accptor);
-
 /* create signal event handler */
     event_handler_t *sig_acceptor = create_signal_handler(reactor, SIGALRM);
     reactor->add_eh(reactor, sig_acceptor);
     printf("create and add signal fd=%d\n to reactor\n", sig_acceptor->fd);
+
+/* create timer event handler*/
+    addTimer(2);
+    event_handler_t *timer_accptor = create_timer_handler(reactor);
+    reactor->add_eh(reactor, timer_accptor);
 
 /* start main loop */
     reactor->event_loop(reactor);

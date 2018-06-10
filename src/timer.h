@@ -10,8 +10,8 @@
 #include <algorithm>
 #include <utility>  /* swap */
 
-#include "../include/slog.h"
-#include "../include/eventhandler.h"
+#include "slog.h"
+#include "eventhandler.h"
 
 using std::exception;
 
@@ -38,7 +38,7 @@ public:
     Timer(int delay) {
         args = nullptr;
         cb_func = nullptr;
-        expire = time(nullptr) + delay;
+        expire = delay;
     }
 
 public:
@@ -50,7 +50,7 @@ public:
 
 class TimerHeap {
 public:
-    TimerHeap(int cap) throw(std::exception): capacity(cap), cur_size(0);
+    TimerHeap(int cap) throw(std::exception);
 //  initialized with an existing array
     TimerHeap(Timer **init_array, int size, int cap) throw(std::exception);
 

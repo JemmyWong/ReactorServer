@@ -8,10 +8,10 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
-#include "../include/reactor.h"
-#include "../include/thread_pool.h"
-#include "../include/header.h"
-#include "../include/eventhandler.h"
+#include "reactor.h"
+#include "thread_pool.h"
+#include "header.h"
+#include "eventhandler.h"
 
 int recv_from_fd(int socket_fd, char *recv_buf, int *recv_len) {
     int rev = -1;

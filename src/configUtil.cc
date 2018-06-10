@@ -6,7 +6,7 @@
 #include <errno.h>
 #include <ctype.h> /* isblank*/
 
-#include "../include/configUtil.h"
+#include "configUtil.h"
 
 /*
 pointer meaning:

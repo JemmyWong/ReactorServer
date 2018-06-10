@@ -1,4 +1,4 @@
-#include "../include/timer.h"
+#include "timer.h"
 
 TimerHeap::TimerHeap(int cap) throw(std::exception): capacity(cap), cur_size(0) {
     array = new Timer *[capacity];

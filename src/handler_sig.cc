@@ -1,10 +1,10 @@
-#include "../include/slog.h"
-#include "../include/timer.h"
-#include "../include/server.h"
-#include "../include/header.h"
-#include "../include/reactor.h"
-#include "../include/thread_pool.h"
-#include "../include/global.h"
+#include "slog.h"
+#include "timer.h"
+#include "server.h"
+#include "header.h"
+#include "reactor.h"
+#include "thread_pool.h"
+#include "global.h"
 
 #include <signal.h>
 
@@ -58,6 +58,7 @@ static void handle_signal_event(handle_event_msg_t *handle_event_msg) {
                 slog_info("handel_signal_event of SIGALRM");
 //                alarm(TIMESLOT);
                 int timer = 1;
+                printf("send timer event to timerPipeFd[1]: %d\n", timerPipeFd[1]);
                 send(timerPipeFd[1], &timer, sizeof(timer), 0);
                 break;
             }

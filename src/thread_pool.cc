@@ -1,7 +1,7 @@
-#include "../include/slog.h"
-#include "../include/global.h"
-#include "../include/thread_pool.h"
-#include "../include/reactor.h"
+#include "slog.h"
+#include "global.h"
+#include "thread_pool.h"
+#include "reactor.h"
 
 static int threadPool_keepAlive = 1;
 

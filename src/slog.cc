@@ -8,7 +8,7 @@
 #include <sys/types.h> /* getpid */
 #include <unistd.h>
 
-#include "../include/slog.h"
+#include "slog.h"
 
 static pthread_rwlock_t lock_env = PTHREAD_RWLOCK_INITIALIZER;
 static pthread_rwlock_t lock_info = PTHREAD_RWLOCK_INITIALIZER;

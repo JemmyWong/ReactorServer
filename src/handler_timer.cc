@@ -1,14 +1,14 @@
 #include <unistd.h> /* alarm */
 
-#include "../include/timer.h"
-#include "../include/eventhandler.h"
+#include "timer.h"
+#include "eventhandler.h"
 
 int timerPipeFd[2] = {-1, -1};
 
 static TimerHeap *timerHeap = new TimerHeap(10);
 
 void timer_handle(void *arg) {
-    printf("^^^^^^^^^ Timer ^^^^^^^^^^^^\n");
+    printf("^^^^^^^^^ Timer test ^^^^^^^^^^^^\n");
 }
 
 void addTimer(int delay) {
@@ -21,8 +21,9 @@ void handle_timer_event(handle_event_msg_t *handle_event_msg) {
     event_handler_t *eh = handle_event_msg->eh;
     uint32_t e = handle_event_msg->e;
 
-    timerHeap->tick();
+//    timerHeap->tick();
     // TODO
+    timer_handle(NULL);
 }
 
 event_handler_t *create_timer_handler(reactor_t *reactor) {
