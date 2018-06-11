@@ -6,15 +6,20 @@
 #define PROJECT_HTTPCONN_H
 
 #include <sys/types.h>
-#include <netietn/in.h>
+#include <netinet/in.h>
 #include <arpa/inet.h>
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/epoll.h>
+#include <sys/mman.h>   /* mmap, munmap */
 #include <sys/stat.h>
-#include <string.h>
-#include <sys/mman.h>
+#include <sys/uio.h>    /* struct iovec */
+#include <cstring>
+#include <cstdlib>      /* atol */
 #include <cerrno>
-#include <stdarg.h>
+#include <stdio.h>
+#include <cstdarg>      /* va_list */
+#include <fcntl.h>
 
 class HttpConn {
 public:
@@ -32,18 +37,22 @@ public:
 
     /* result of http request processed */
     enum HTTP_CODE { NO_REQUEST, GET_REQUEST, BAD_REQUEST,
-            NO_RESOURCE, FORBIDDEN,_REQUEST, FILE_REQUEST,
+            NO_RESOURCE, FORBIDDEN_REQUEST,_REQUEST, FILE_REQUEST,
             INTERNAL_ERROR, CLOSED_CONNECTION};
 
     /* state of line read */
-    enum LINE_STATUS {LINE_OK = 0, LINE_BND, LINE_OPEN};
+    enum LINE_STATUS {
+            LINE_OK = 0,    /* complete request line */
+            LINE_BAD,       /* incomplete request line */
+            LINE_OPEN       /* line is reading */
+    };
 
 public:
     HttpConn();
     ~HttpConn();
 public:
     /* init a connection */
-    void init(int sockFd, const sockaddr_int &addr);
+    void init(int sockFd, const sockaddr_in &addr);
 
     void closeConn(bool realClose = true);
 
@@ -56,26 +65,27 @@ public:
 private:
     void init();
     /* parse request */
-    HTTP_CODE processRead();
-    /* response http */
+    HTTP_CODE processRead();    /* 1. main state machine */
+    /* response http request */
     bool processWrite(HTTP_CODE code);
 
     /* called by processRead to parse http request */
+    LINE_STATUS parseLine();    /* 2. slave state machine, check whether read a complete line */
     HTTP_CODE  parseRequestLine(char *text);
     HTTP_CODE  parseHeaders(char *text);
     HTTP_CODE  parseContent(char *text);
-    HTTP_CODE doRequest();
+    HTTP_CODE  doRequest();
     char *getLine() {return readBuf + startLine; };
-    LINE_STATUS parseLine();
 
     /* called by processWrite to make a response */
-     void unmap();
-     bool addResponse(const char *format, ...);
-     bool addContent(const char *content);
-     bool addStatusLine(int status, const char *title);
-     bool adContentLength(int len);
-     bool addLinger();
-     bool addBlankLine();
+    void unmap();
+    bool addResponse(const char *format, ...);
+    bool addStatusLine(int status, const char *title);
+    bool addHeaders(int len);
+    bool addContent(const char *content);
+    bool addContentLength(int len);
+    bool addLinger();
+    bool addBlankLine();
 
 public:
     static int epollFd;
@@ -86,22 +96,21 @@ private:
 
     char        readBuf[READ_BUFFER_SIZE];
     int         readIdx;    /* position of the char has read in the buf*/
-    int         checkedIdx; /* position of the char in the buf */
     int         startLine;  /* position of line parsing */
+    int         checkedIdx; /* position of the char has checked in the buf */
+    CHECK_STATE checkState; /* status of status machine */
 
     char        writeBuf[WRITE_BUFFER_SIZE];
     int         writeIdx;   /* num of bytes need send */
 
-    CHECK_STATE checkState; /* status of status machine */
-    METHOD      method;     /* GET, POST */
-
-    char        readFile[FILENAME_LEN]; /* full path of file requested by user */
+    METHOD      method;         /* GET, POST */
     char        *url;           /* file name requested */
     char        *version;       /* HTTP/1.1 */
     char        *host;
     int         contentLength;  /* length of request message */
     bool        linger;         /* keep connection or no*/
 
+    char        readFile[FILENAME_LEN]; /* full path of file requested by user */
     char        *fileAddress;   /* position of file requested and mmap in the memory */
     struct stat fileStat;
     struct iovec iv[2];

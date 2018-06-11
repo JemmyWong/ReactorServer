@@ -13,6 +13,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/epoll.h>
+#include <sys/stat.h> /* umask*/
+#include <sys/types.h>
 
 void daemon();
 

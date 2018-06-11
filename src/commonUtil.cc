@@ -39,9 +39,9 @@ int setNonBlock(int fd) {
 void addFd(int epollFd, int fd, bool oneShot) {
     struct epoll_event ee;
     ee.data.fd = fd;
-    ee.evnets = EPOLLIN | EPOLLET | EPOLLRDHUP;
+    ee.events = EPOLLIN | EPOLLET | EPOLLRDHUP;
     if (oneShot) ee.events |= EPOLLONESHOT;
-    epoll_ctl(epllFd, EPOLL_CTL_ADD, fd, &ee);
+    epoll_ctl(epollFd, EPOLL_CTL_ADD, fd, &ee);
     setNonBlock(fd);
 }
 

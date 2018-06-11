@@ -7,7 +7,7 @@
  * event handler:
  * 1. listen socket event
  * 2. client socket event
- * 3. timer event // TODO handle timer event
+ * 3. timer event
  */
 
 
