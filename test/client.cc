@@ -6,7 +6,9 @@
 #include <netdb.h> /* hostent */
 #include <errno.h>
 
-#include "../include/configUtil.h"
+#include "../src/configUtil.h"
+#include "../src/HttpConn.h"
+#include "../src/commonUtil.h"
 
 
 #define PORT 9000
@@ -30,13 +32,32 @@ void *send_sock(void *arg) {
 //    close(fd);
 }
 
-void start_thread_pool(void *arg) {
-    pthread_t thds[10];
-    int i;
-    for (i = 0; i < 10; ++i) {
-        pthread_create(&thds[i], NULL, send_sock, arg);
+void *sendHttpRequest(void *arg) {
+    int fd = *(reinterpret_cast<int *>(arg));
+    char * request = "GET /index.html HTTP/1.1\r\nConnection: keep-alive\r\nContent-Length: 10\r\n\r\nabcddfesdf";
+    if (send(fd, request, strlen(request), 0) == -1) {
+            fprintf(stderr, "send_sock errror: %s\n", strerror(errno));
+            exit(1);
     }
-    for (i = 0; i < 10; ++i) {
+    char buf[4096];
+    memset(buf, '\0', sizeof(buf));
+    if (recv(fd, buf, 4096, 0) == -1) {
+        fprintf(stderr, "recv from server error: %s\n", strerror(errno));
+    } else {
+        printf("recv form server: %s\n", buf);
+        printf("++++++++++   ++++++++++++++++   totalConn: <%d>\n\n", ++totalConn);
+    }
+
+}
+
+
+void start_thread_pool(void *arg) {
+    pthread_t thds[1];
+    int i;
+    for (i = 0; i < 1; ++i) {
+        pthread_create(&thds[i], NULL, sendHttpRequest, arg);
+    }
+    for (i = 0; i < 1; ++i) {
         pthread_join(thds[i], 0);
     }
 }
@@ -130,7 +151,7 @@ int main(int argc, char **argv) {
     int i;
     int n = atoi(argv[1]);
     for (i = 0; i < n; ++i) {
-        pthread_create(&thds[i], NULL, multiSingleThread, NULL);
+        pthread_create(&thds[i], NULL, threadMain, NULL);
     }
     for (i = 0; i < n; ++i) {
         pthread_join(thds[i], 0);

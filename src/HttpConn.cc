@@ -17,7 +17,7 @@ const char *error_500_title = "Internal Error";
 const char *error_500_form = "There was an unusual problem serving the request file.\n";
 
 /* root path of web */
-const char *docRoot = "/work/ReactorServer/build";
+const char *docRoot = "/work";
 
 
 int HttpConn::userCount = 0;
@@ -25,7 +25,7 @@ int HttpConn::epollFd = -1;
 
 void HttpConn::closeConn(bool realClose) {
     if (realClose && (sockFd != -1)) {
-        removeFd(epollFd, sockFd);
+//        removeFd(epollFd, sockFd);
         sockFd = -1;
         --userCount;
     }
@@ -39,7 +39,7 @@ void HttpConn::init(int sockFd, const sockaddr_in &addr) {
     int reuse = 1;
     setsockopt(sockFd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
 
-    addFd(epollFd, sockFd, true);
+//    addFd(epollFd, sockFd, true);
     ++userCount;
 
     init();
@@ -184,6 +184,7 @@ HttpConn::HTTP_CODE HttpConn::parseContent(char *text) {
 }
 
 /* main state machine */
+/* process client request line and doRequest */
 HttpConn::HTTP_CODE HttpConn::processRead() {
     LINE_STATUS status = LINE_OK;
     HTTP_CODE  ret = NO_REQUEST;
@@ -224,6 +225,7 @@ HttpConn::HTTP_CODE HttpConn::processRead() {
     return NO_REQUEST;
 }
 
+/* mmap the file which client request into memory */
 HttpConn::HTTP_CODE HttpConn::doRequest() {
     strcpy(readFile, docRoot);
     int len = strlen(docRoot);
@@ -249,6 +251,8 @@ void HttpConn::unmap() {
     }
 }
 
+/* write the response to client */
+// TODO readBuf, writeBuf clean up
 bool HttpConn::write() {
     int tmp = 0;
     int bytes_have_send = 0;
@@ -390,6 +394,7 @@ void HttpConn::process() {
         modFd(epollFd, sockFd, EPOLLIN);
         return;
     }
+
 
     bool writeRet = processWrite(readRet);
     if (!writeRet) {

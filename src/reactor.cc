@@ -6,6 +6,7 @@
 
 #include "slog.h"
 #include "reactor.h"
+#include "commonUtil.h"
 #include "header.h"
 #include "reactor.h"
 #include "configUtil.h"
@@ -45,9 +46,10 @@ int add_eh(reactor_t *reactor, event_handler_t *eh) {
     }
     pthread_mutex_lock(&mutex_eh);
     if (reactor->core->current_idx < MAX_USER) {
-        ee.data.fd = eh->fd;
-        ee.events = EPOLLIN | EPOLLET | EPOLLRDHUP;
-        epoll_ctl(reactor->core->epoll_fd, EPOLL_CTL_ADD, eh->fd, &ee);
+//        ee.data.fd = eh->fd;
+//        ee.events = EPOLLIN | EPOLLET | EPOLLRDHUP;
+//        epoll_ctl(reactor->core->epoll_fd, EPOLL_CTL_ADD, eh->fd, &ee);
+        addFd(reactor->core->epoll_fd, eh->fd, true);
 
         reactor->core->ehs[reactor->core->current_idx++] = eh;
         printf("add event to reactor, core current idx:[%d], fd:[%d]\n",
@@ -80,9 +82,10 @@ int rm_eh(reactor_t *reactor, int fd) {
               (int)reactor->core->current_idx-1, fd);
     pthread_mutex_unlock(&mutex_eh);
 
-    epoll_ctl(reactor->core->epoll_fd, EPOLL_CTL_DEL, fd, 0);
+//    epoll_ctl(reactor->core->epoll_fd, EPOLL_CTL_DEL, fd, 0);
+    removeFd(reactor->core->epoll_fd, fd);
 
-    close(eh->fd);
+//    close(eh->fd);
     free(eh);
 }
 
@@ -108,7 +111,7 @@ int event_loop(reactor_t *reactor) {
                 // user_offline(ees[i].data.fd);
                 printf("user down\n");
                 slog_info("user down, fd<%d>", ees[i].data.fd);
-                rm_eh(reactor, ees[i].data.fd);
+//                rm_eh(reactor, ees[i].data.fd);
             } else {
                 eh = find_eh(reactor->core, ees[i].data.fd, 0);
                 if (eh) {

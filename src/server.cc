@@ -6,6 +6,7 @@
 #include "timer.h"
 #include "server.h"
 #include "reactor.h"
+#include "HttpConn.h"
 #include "configUtil.h"
 #include "thread_pool.h"
 #include "sig_handler.h"
@@ -57,6 +58,8 @@ int main(int argc, char **argv) {
     assert(ret != -1);
 
     reactor_t *reactor = create_reactor(epollfd, threadPool);
+
+    HttpConn::epollFd = epollfd;
 
 /* create listen fd event handler */
     event_handler_t *io_acceptor = create_listen_handler(listenfd, reactor);

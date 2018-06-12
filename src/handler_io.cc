@@ -105,7 +105,9 @@ void handle_client_event(handle_event_msg_t *handle_event_msg) {
 //            // reveive_message(receive_msg);
 //        }
 //        ret = recv(eh->fd, msgBuf, 4096, 0);
-        ret = recv_from_fd(eh->fd, msgBuf, &recv_len);
+
+
+        /*ret = recv_from_fd(eh->fd, msgBuf, &recv_len);
         if (recv_len > 4096) {
             printf("error recv from fd<%d> buffer overflow, recv_len: %d\n", eh->fd, recv_len);
         }
@@ -123,7 +125,22 @@ void handle_client_event(handle_event_msg_t *handle_event_msg) {
 
         free(package);
         free(receive_msg);
-        free(handle_event_msg);
+        free(handle_event_msg);*/
+
+
+        if (eh->httpConn->read()) {
+            eh->httpConn->process();
+//            eh->httpConn->write();
+        } else {
+            eh->httpConn->closeConn();
+            delete(eh->httpConn);
+        }
+    } else if (e & EPOLLOUT) {
+        if (!eh->httpConn->write()) {
+            eh->httpConn->closeConn();
+            delete(eh->httpConn);
+        }
+
     }
 }
 
@@ -153,6 +170,9 @@ void handle_listen_event(handle_event_msg_t *handle_event_msg) {
 
     /* listen client event handler */
     event_handler_t *ceh = create_client_handler(cli_fd, eh->reactor);
+    ceh->httpConn = new HttpConn();
+    ceh->httpConn->init(cli_fd, cli_addr);
+
     eh->reactor->add_eh(eh->reactor, ceh);
     printf("accept client event fd: %d\n", cli_fd);
 

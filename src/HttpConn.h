@@ -48,8 +48,8 @@ public:
     };
 
 public:
-    HttpConn();
-    ~HttpConn();
+    HttpConn() {};
+    ~HttpConn() {};
 public:
     /* init a connection */
     void init(int sockFd, const sockaddr_in &addr);

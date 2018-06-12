@@ -3,6 +3,8 @@
 
 #include <stdint.h> /* uint32_t */
 
+#include "HttpConn.h"
+
 /*
  * event handler:
  * 1. listen socket event
@@ -17,6 +19,7 @@ typedef struct handle_event_msg handle_event_msg_t;
 /* Node for the event handler of a socket fd */
 typedef struct event_handler {
     int fd;
+    HttpConn *httpConn;
     struct reactor *reactor;
     void (*handle_event)(handle_event_msg_t *handle_event_msg);
 } event_handler_t;

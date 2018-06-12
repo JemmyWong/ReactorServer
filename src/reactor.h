@@ -2,8 +2,10 @@
 #define _REACTOR_H_
 
 #include "global.h"
+#include "HttpConn.h"
 #include "eventhandler.h"
 #include "thread_pool.h"
+#include <unordered_map>
 
 #define MAX_USER    65530
 
