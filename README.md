@@ -5,6 +5,7 @@
 4. [Support timer, based on heap](src/timer.cc)
 5. Unified event source: [I/O Event](src/handler_io.cc), [Signal Event](src/handler_sig.cc), [Timer Event](src/handler_timer.cc)
 6. Support HTTP Get request
+7. Support half-sync/half-async concurrency mode
 
 ## TODO:
 1. - [ ] Higher concurrence

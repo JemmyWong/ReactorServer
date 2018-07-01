@@ -17,18 +17,20 @@ pthread_mutex_t mutex_eh = PTHREAD_MUTEX_INITIALIZER;
 event_handler_t *find_eh(reactor_core_t *core, int fd, int *index) {
     int i = 0;
     event_handler_t *tmp;
-    pthread_mutex_lock(&mutex_eh);
-    for (; i < core->current_idx; ++i) {
-        if ((tmp = core->ehs[i]) && (tmp->fd == fd)) {
-            if (index) *index = i;
-            printf("find_eh, fd[%d], index[%d]\n", fd, i);
-            slog_info("find_eh, fd[%d], index[%d]", fd, i);
+    {
+        pthread_mutex_lock(&mutex_eh);
+        for (; i < core->current_idx; ++i) {
+            if ((tmp = core->ehs[i]) && (tmp->fd == fd)) {
+                if (index) *index = i;
+                printf("find_eh, fd[%d], index[%d]\n", fd, i);
+                slog_info("find_eh, fd[%d], index[%d]", fd, i);
 
-            pthread_mutex_unlock(&mutex_eh);
-            return tmp;
+                pthread_mutex_unlock(&mutex_eh);
+                return tmp;
+            }
         }
+        pthread_mutex_unlock(&mutex_eh);
     }
-    pthread_mutex_unlock(&mutex_eh);
 
     printf("not found event_handler which fd:[%d]\n", fd);
     slog_error("not found event_handler which fd:[%d]", fd);

@@ -8,6 +8,7 @@
 #include <iostream>
 #include <cerrno>
 #include <cstring>
+#include <cassert>
 
 #include <signal.h>
 #include <unistd.h>
@@ -15,6 +16,7 @@
 #include <sys/epoll.h>
 #include <sys/stat.h> /* umask*/
 #include <sys/types.h>
+#include <pthread.h>
 
 void daemon();
 
