@@ -11,12 +11,13 @@
 #include <cassert>
 
 #include <unistd.h>
-#include <sys/types.h>
+#include <sys/types.h> /* pid_t */
 #include <pthread.h>
 
 class MutexLock {
 public:
     explicit MutexLock();
+    MutexLock(MutexLock &) = delete;
     ~MutexLock() ;
     void lock();
     void unlock();
@@ -24,12 +25,13 @@ public:
     bool isLockedByThisThread();
     pthread_mutex_t getPthreadMutex();
 private:
-    pthread_t holder_;
+    pid_t holder_; /* pthead_t */
     pthread_mutex_t mutex_;
 };
 
 class MutexLockGuard {
 public:
+    MutexLockGuard(MutexLockGuard &) = delete;
     explicit MutexLockGuard(MutexLock& mutex);
     ~MutexLockGuard();
 private:
@@ -41,6 +43,7 @@ private:
 class Condition {
 public:
     explicit Condition(MutexLock &mutex);
+    Condition(Condition &) = delete;
     ~Condition();
     void wait();
     void notify();
@@ -53,6 +56,7 @@ private:
 class CountDownLatch {
 public:
     explicit CountDownLatch(int cnt);
+    CountDownLatch(CountDownLatch &) = delete;
     void wait();
     void countDown();
     int getCount();

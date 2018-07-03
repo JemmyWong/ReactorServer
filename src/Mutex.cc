@@ -7,27 +7,28 @@
 MutexLock::MutexLock(): holder_(0) {
     pthread_mutex_init(&mutex_, NULL);
 }
+
 MutexLock::~MutexLock() {
     assert(holder_ == 0);
     pthread_mutex_destroy(&mutex_);
 }
 
-void MutexLock:: lock() {
+void MutexLock::lock() {
     pthread_mutex_lock(&mutex_); // order can't be changed
-    holder_ = pthread_self();
+    holder_ = static_cast<pid_t>(::syscall(SYS_gettid));
 }
 
-void MutexLock:: unlock() {
-    holder_ = 0; // order can't be changed
+void MutexLock::unlock() {
+    holder_ = 0;                // order can't be changed
     pthread_mutex_unlock(&mutex_);
 }
 
-void MutexLock:: assertLocked() {
+void MutexLock::assertLocked() {
     assert(isLockedByThisThread());
 }
 
-bool MutexLock:: isLockedByThisThread() {
-    return holder_ == pthread_self();
+bool MutexLock::isLockedByThisThread() {
+    return holder_ == static_cast<pid_t>(::syscall(SYS_gettid));;
 }
 
 pthread_mutex_t MutexLock:: getPthreadMutex() {

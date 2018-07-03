@@ -101,7 +101,7 @@ private:
     CHECK_STATE checkState; /* status of status machine */
 
     char        writeBuf[WRITE_BUFFER_SIZE];
-    int         writeIdx;   /* num of bytes need send */
+    int         writeIdx;       /* num of bytes need send */
 
     METHOD      method;         /* GET, POST */
     char        *url;           /* file name requested */
