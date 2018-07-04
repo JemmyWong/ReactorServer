@@ -31,8 +31,8 @@ bool MutexLock::isLockedByThisThread() {
     return holder_ == static_cast<pid_t>(::syscall(SYS_gettid));;
 }
 
-pthread_mutex_t MutexLock:: getPthreadMutex() {
-    return mutex_;
+pthread_mutex_t *MutexLock:: getPthreadMutex() {
+    return &mutex_;
 }
 
 /*************************** MutexLockGuard *****************************/
@@ -52,7 +52,7 @@ Condition::Condition(MutexLock &mutex): mutex_(mutex) {
 }
 
 Condition::~Condition() {
-    pthread_cond_destroy(&pcond);
+    pthread_cond_destroy(&pcond_);
 }
 
 void Condition:: wait() {
@@ -60,11 +60,11 @@ void Condition:: wait() {
 }
 
 void Condition:: notify() {
-    pthread_cond_signal(&pcond);
+    pthread_cond_signal(&pcond_);
 }
 
 void Condition:: notifyAll() {
-    pthred_cond_brodcast(&pcond);
+    pthread_cond_broadcast(&pcond_);
 }
 
 /*************************** CountDownLatch ****************************/

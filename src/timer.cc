@@ -1,4 +1,5 @@
 #include "timer.h"
+#include "Mutex.h"
 
 TimerHeap::TimerHeap(int cap) throw(std::exception): capacity(cap), cur_size(0) {
     array = new Timer *[capacity];
@@ -38,19 +39,21 @@ TimerHeap::~TimerHeap() {
 void TimerHeap::add_timer(Timer *timer) throw(std::exception) {
     if (!timer) return;
 
-    pthread_mutex_lock(&mutex);
-    if (cur_size >= capacity)   resize();
+    {
+        MutexLockGuard lock(mutex);
 
-    int hole = cur_size++;
-    int parent = 0;
-    for (; hole > 0; hole = parent) {
-        parent = (hole - 1) / 2;
-        if (array[parent]->expire <= timer->expire)
-            break;
-        array[hole] = array[parent];
+        if (cur_size >= capacity) resize();
+
+        int hole = cur_size++;
+        int parent = 0;
+        for (; hole > 0; hole = parent) {
+            parent = (hole - 1) / 2;
+            if (array[parent]->expire <= timer->expire)
+                break;
+            array[hole] = array[parent];
+        }
+        array[hole] = timer;
     }
-    array[hole] = timer;
-    pthread_mutex_unlock(&mutex);
 
     printf("new timer added, expire<%d>, heap capacity<%d>\n", timer->expire, capacity);
     slog_info("new timer added, expire<%d>, heap capacity<%d>", timer->expire, capacity);

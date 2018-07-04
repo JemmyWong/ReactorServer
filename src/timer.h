@@ -11,6 +11,7 @@
 #include <utility>  /* swap */
 
 #include "slog.h"
+#include "Mutex.h"
 #include "eventhandler.h"
 
 using std::exception;
@@ -79,7 +80,8 @@ private:
     int     capacity;
     int     cur_size;
     /* lock heap when add, del timer */
-    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+//    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+    MutexLock mutex;
 };
 
 #endif

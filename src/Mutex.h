@@ -12,6 +12,7 @@
 
 #include <unistd.h>
 #include <sys/types.h> /* pid_t */
+#include <sys/syscall.h>
 #include <pthread.h>
 
 class MutexLock {
@@ -23,7 +24,7 @@ public:
     void unlock();
     void assertLocked();
     bool isLockedByThisThread();
-    pthread_mutex_t getPthreadMutex();
+    pthread_mutex_t *getPthreadMutex();
 private:
     pid_t holder_; /* pthead_t */
     pthread_mutex_t mutex_;
@@ -31,7 +32,6 @@ private:
 
 class MutexLockGuard {
 public:
-    MutexLockGuard(MutexLockGuard &) = delete;
     explicit MutexLockGuard(MutexLock& mutex);
     ~MutexLockGuard();
 private:
@@ -43,7 +43,6 @@ private:
 class Condition {
 public:
     explicit Condition(MutexLock &mutex);
-    Condition(Condition &) = delete;
     ~Condition();
     void wait();
     void notify();
@@ -64,6 +63,6 @@ private:
     MutexLock mutex_;
     Condition cond_;
     int count_;
-}
+};
 
 #endif //PROJECT_MUTEX_H
