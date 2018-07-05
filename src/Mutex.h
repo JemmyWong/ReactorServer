@@ -18,7 +18,7 @@
 class MutexLock {
 public:
     explicit MutexLock();
-    MutexLock(MutexLock &) = delete;
+    MutexLock(MutexLock &) = delete; /* noncopy */
     ~MutexLock() ;
     void lock();
     void unlock();

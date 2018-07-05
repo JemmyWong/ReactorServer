@@ -64,11 +64,12 @@ void TimerHeap::del_timer(Timer *timer) {
     if (!timer) return;
 //        timer->cb_func = NULL; TODO del_timer
 
-    pthread_mutex_lock(&mutex);
-    for (int i = (cur_size-1)/2; i >=0; --i) {
-        percolate_down(i);
+    {
+        MutexLockGuard lock(mutex);
+        for (int i = (cur_size-1)/2; i >=0; --i) {
+            percolate_down(i);
+        }
     }
-    pthread_mutex_unlock(&mutex);
 }
 
 Timer *TimerHeap::top() const {
@@ -78,14 +79,14 @@ Timer *TimerHeap::top() const {
 
 void TimerHeap::pop() {
     if (empty()) return;
-
-    pthread_mutex_lock(&mutex);
-    if (array[0]) {
-        delete array[0];
-        array[0] = array[--cur_size];
-        percolate_down(0);
+    {
+        MutexLockGuard lock(mutex);
+        if (array[0]) {
+            delete array[0];
+            array[0] = array[--cur_size];
+            percolate_down(0);
+        }
     }
-    pthread_mutex_unlock(&mutex);
 }
 
 void TimerHeap::tick() {

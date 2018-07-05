@@ -7,8 +7,8 @@ static int threadPool_keepAlive = 1;
 
 /* serialize queue access*/
 /* initialization will not execute immediately until first call */
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-
+//pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+MutexLock mutex;
 /*
  * data members of threadPool_t must be initialized in correct order,
  * otherwise, segment fault
@@ -105,12 +105,11 @@ void threadPool_add_work(threadPool_t *threadPool, void (*function)(void *), voi
     thread_job_t *newJob = (thread_job_t *)malloc(sizeof(thread_job_t));
     newJob->function = function;
     newJob->arg = arg;
-
-    pthread_mutex_lock(&mutex);
-    threadPool_jobQueue_add(threadPool, newJob);
-    slog_info("add new job to jobQueue, fd<%d>", ((handle_event_msg_t *)arg)->eh->fd);
-    pthread_mutex_unlock(&mutex);
-
+    {
+        MutexLockGuard lock(mutex);
+        threadPool_jobQueue_add(threadPool, newJob);
+        slog_info("add new job to jobQueue, fd<%d>", ((handle_event_msg_t *)arg)->eh->fd);
+    }
     // TODO segment fault
 //    printf("new job add to jobQueue, fd=%d\n", ((handle_event_msg_t *)arg)->eh->fd);
 }
@@ -127,17 +126,17 @@ void threadPool_job_do(threadPool_t *threadPool) {
             FUNC function;
             void *args;
             thread_job_t *job;
-            pthread_mutex_lock(&mutex);
-            job = threadPool_jobQueue_peek(threadPool);
-            function = job->function;
-            args = job->arg;
-            /* TODO mutex will not unblock? */
-            /* what happened to the thread when it exit this function, died? */
-            if (threadPool_jobQueue_removeLast(threadPool)) {
-                pthread_mutex_unlock(&mutex);
-                return;
+            {
+                MutexLockGuard lock(mutex);
+                job = threadPool_jobQueue_peek(threadPool);
+                function = job->function;
+                args = job->arg;
+                /* TODO mutex will not unblock? */
+                /* what happened to the thread when it exit this function, died? */
+                if (threadPool_jobQueue_removeLast(threadPool)) {
+                    return;
+                }
             }
-            pthread_mutex_unlock(&mutex);
             printf("thread[%d] get a job\n", pthread_self());
             slog_info("thread<%d> get a job", pthread_self());
             function((handle_event_msg_t *)args);

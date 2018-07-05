@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
 
 
 /* init system */
-    threadPool = threadPool_init(30);
+    threadPool = threadPool_init(20);
 
     ret = init_server(&listenfd, &epollfd);
     if (ret) {
@@ -122,6 +122,8 @@ int init_server(int *listenfd, int *epoolfd) {
         return -1;
     }
 
+    /* Since Linux 2.6.8, the size argument is ignored,
+     * but must be greater than zero */
     strcmp(key, "MAX_EPOLL");
     get_config(configPath, key, value);
     *epoolfd = epoll_create(atoi(value));

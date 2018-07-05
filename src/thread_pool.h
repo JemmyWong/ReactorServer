@@ -3,6 +3,7 @@
 
 #include <semaphore.h>
 #include <pthread.h>
+#include "Mutex.h"
 
 typedef void (*FUNC)(void *arg);
 

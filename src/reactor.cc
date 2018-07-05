@@ -10,30 +10,28 @@
 #include "header.h"
 #include "reactor.h"
 #include "configUtil.h"
+#include "Mutex.h"
 
 static char configPath[255] = "../config.conf";
-pthread_mutex_t mutex_eh = PTHREAD_MUTEX_INITIALIZER;
+//pthread_mutex_t mutex_eh = PTHREAD_MUTEX_INITIALIZER;
+MutexLock mutex_eh;
 
 event_handler_t *find_eh(reactor_core_t *core, int fd, int *index) {
     int i = 0;
     event_handler_t *tmp;
     {
-        pthread_mutex_lock(&mutex_eh);
+        MutexLockGuard lock(mutex_eh);
         for (; i < core->current_idx; ++i) {
             if ((tmp = core->ehs[i]) && (tmp->fd == fd)) {
                 if (index) *index = i;
                 printf("find_eh, fd[%d], index[%d]\n", fd, i);
                 slog_info("find_eh, fd[%d], index[%d]", fd, i);
-
-                pthread_mutex_unlock(&mutex_eh);
                 return tmp;
             }
         }
-        pthread_mutex_unlock(&mutex_eh);
+        printf("not found event_handler which fd:[%d]\n", fd);
+        slog_error("not found event_handler which fd:[%d]", fd);
     }
-
-    printf("not found event_handler which fd:[%d]\n", fd);
-    slog_error("not found event_handler which fd:[%d]", fd);
 
     return NULL;
 }
@@ -46,20 +44,21 @@ int add_eh(reactor_t *reactor, event_handler_t *eh) {
         printf("fd < 0 or handle_event is NULL\n");
         result = -1;
     }
-    pthread_mutex_lock(&mutex_eh);
-    if (reactor->core->current_idx < MAX_USER) {
+    {
+        MutexLockGuard lock(mutex_eh);
+        if (reactor->core->current_idx < MAX_USER) {
 //        ee.data.fd = eh->fd;
 //        ee.events = EPOLLIN | EPOLLET | EPOLLRDHUP;
 //        epoll_ctl(reactor->core->epoll_fd, EPOLL_CTL_ADD, eh->fd, &ee);
-        addFd(reactor->core->epoll_fd, eh->fd, true);
+            addFd(reactor->core->epoll_fd, eh->fd, true);
 
-        reactor->core->ehs[reactor->core->current_idx++] = eh;
-        printf("add event to reactor, core current idx:[%d], fd:[%d]\n",
-               (int)reactor->core->current_idx-1, eh->fd);
-    } else {
-        result = -1;;
+            reactor->core->ehs[reactor->core->current_idx++] = eh;
+            printf("add event to reactor, core current idx:[%d], fd:[%d]\n",
+                   (int)reactor->core->current_idx-1, eh->fd);
+        } else {
+            result = -1;;
+        }
     }
-    pthread_mutex_unlock(&mutex_eh);
 
     return result;
 }
@@ -75,14 +74,14 @@ int rm_eh(reactor_t *reactor, int fd) {
         printf("invalid event_handler index:[%d]\n", position);
         return -2;
     }
-
-    pthread_mutex_lock(&mutex_eh);
-    reactor->core->ehs[position] = reactor->core->ehs[reactor->core->current_idx--];
-    printf("remove event handler from reactor, core current idx:[%d], fd:[%d]\n",
-           (int)reactor->core->current_idx-1, fd);
-    slog_info("rm event handler, core current idx:[%d], fd:[%d]",
-              (int)reactor->core->current_idx-1, fd);
-    pthread_mutex_unlock(&mutex_eh);
+    {
+        MutexLockGuard lock(mutex_eh);
+        reactor->core->ehs[position] = reactor->core->ehs[reactor->core->current_idx--];
+        printf("remove event handler from reactor, core current idx:[%d], fd:[%d]\n",
+               (int)reactor->core->current_idx-1, fd);
+        slog_info("rm event handler, core current idx:[%d], fd:[%d]",
+                  (int)reactor->core->current_idx-1, fd);
+    }
 
 //    epoll_ctl(reactor->core->epoll_fd, EPOLL_CTL_DEL, fd, 0);
     removeFd(reactor->core->epoll_fd, fd);
@@ -101,7 +100,7 @@ int event_loop(reactor_t *reactor) {
     strcpy(key, "MAX_EPOLL_EVENT");
     get_config(configPath, key, value);
     struct epoll_event ees[atoi(value)];
-    event_handler_t *eh;
+    event_handler_t *eh= NULL;
     while (1) {
         num = epoll_wait(reactor->core->epoll_fd, ees, atoi(value), -1);
         printf("epoll_wait return, detect event number is %d\n", num);

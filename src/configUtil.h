@@ -6,6 +6,7 @@
 #include <string.h>
 #include <string>
 #include <map>
+#include <pthread.h>
 
 /*
 char configPath[255] = "../config.ini";
@@ -17,14 +18,14 @@ int get_config(char *file, char *key, char *value);
 
 class ConfigFile {
 public:
-    ConfigFile(string file);
-
+    void init(string fileName);
+    static void initKeyValue();
     string getValue(string key);
-
     int setValue(string key, string value);
 private:
     string fileName;
     std::map<string, string> confMap;
+    static pthread_once_t ponce;
 };
 
 #endif

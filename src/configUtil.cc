@@ -62,3 +62,16 @@ int get_config(char *file, char *key, char *value) {
     fclose(fd);
     return find;
 }
+
+pthread_once_t ConfigFile::ponce = PTHREAD_ONCE_INIT;
+
+void ConfigFile::init(string fileName_) {
+    if (fileName.empty()) {
+        fileName = std::move(fileName_);
+    }
+    pthread_once(&ponce, &ConfigFile::initKeyValue);
+}
+
+void ConfigFile::initKeyValue() {
+
+}

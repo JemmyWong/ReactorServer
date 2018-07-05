@@ -19,8 +19,8 @@ public:
 private:
     int     threadSize;
     int     threadNumber;
-    pthread_mutex_t mutex = PTHREAD_MUTEXT_INITIALIZER;
-    ThreadJobQueue jobQueue;
+    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+//    ThreadJobQueue jobQueue;
 };
 
 class ThreadJobQueue {
