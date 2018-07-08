@@ -6,9 +6,9 @@
 #include <netdb.h> /* hostent */
 #include <errno.h>
 
-#include "../src/configUtil.h"
+#include "ConfigUtil.h"
 #include "../src/HttpConn.h"
-#include "../src/commonUtil.h"
+#include "CommonUtil.h"
 
 
 #define PORT 9000

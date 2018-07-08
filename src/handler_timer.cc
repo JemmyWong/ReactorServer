@@ -1,7 +1,7 @@
 #include <unistd.h> /* alarm */
 
 #include "timer.h"
-#include "eventhandler.h"
+#include "../v0.1/eventhandler.h"
 
 int timerPipeFd[2] = {-1, -1};
 

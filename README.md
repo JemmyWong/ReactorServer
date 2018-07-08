@@ -1,12 +1,13 @@
 ## **************************** Reactor Server ********************************* 
 1. Based on reactor architecture
-2. [Support config file](src/configUtil.cc)
-3. [Support log](src/slog.cc)
-4. [Support timer, based on heap](src/timer.cc)
-5. Unified event source: [I/O Event](src/handler_io.cc), [Signal Event](src/handler_sig.cc), [Timer Event](src/handler_timer.cc)
-6. Support HTTP Get request
-7. Support half-sync/half-async concurrency mode
-8. Use RAII to wrap mutex, condition
+2. Implemented in C++11
+3. [Support config file](src/configUtil.cc)
+4. [Support log](src/slog.cc)
+5. [Support timer, based on heap](src/timer.cc)
+6. Unified event source: [I/O Event](src/handler_io.cc), [Signal Event](src/handler_sig.cc), [Timer Event](src/handler_timer.cc)
+7. Support HTTP Get request
+8. Half-sync/half-async concurrency mode
+9. Use RAII(Resource Acquisition Is Initialization) to manage resource
 
 ## TODO:
 1. - [ ] Higher concurrence

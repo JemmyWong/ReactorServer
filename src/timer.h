@@ -12,7 +12,7 @@
 
 #include "slog.h"
 #include "Mutex.h"
-#include "eventhandler.h"
+#include "../v0.1/eventhandler.h"
 
 using std::exception;
 

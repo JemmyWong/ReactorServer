@@ -2,7 +2,7 @@
 // Created by Jemmy on 2018/6/10.
 //
 
-#include "commonUtil.h"
+#include "CommonUtil.h"
 
 /* daemon process */
 void daemon() {

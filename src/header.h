@@ -2,8 +2,8 @@
 #define _HEADER_H_
 
 #include <stdint.h>
-#include "reactor.h"
-#include "eventhandler.h"
+#include "../v0.1/reactor.h"
+#include "../v0.1/eventhandler.h"
 
 #define MAX_LENGTH   (5 * 1024);
 

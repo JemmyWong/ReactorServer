@@ -17,6 +17,13 @@
 #include <sys/stat.h> /* umask*/
 #include <sys/types.h>
 #include <pthread.h>
+#include <sys/syscall.h>
+
+#ifdef SYS_gettid
+#define gettid() syscall(SYS_gettid)
+#else
+#error "SYS_gettid unavailable on this system"
+#endif
 
 void daemon();
 
