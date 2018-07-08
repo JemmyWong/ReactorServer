@@ -6,10 +6,10 @@
 
 #include "slog.h"
 #include "reactor.h"
-#include "commonUtil.h"
+#include "CommonUtil.h"
 #include "header.h"
 #include "reactor.h"
-#include "configUtil.h"
+#include "ConfigUtil.h"
 #include "Mutex.h"
 
 static char configPath[255] = "../config.conf";

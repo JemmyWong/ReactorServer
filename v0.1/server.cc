@@ -7,7 +7,7 @@
 #include "server.h"
 #include "reactor.h"
 #include "HttpConn.h"
-#include "configUtil.h"
+#include "ConfigUtil.h"
 #include "thread_pool.h"
 #include "sig_handler.h"
 #include "eventhandler.h"
