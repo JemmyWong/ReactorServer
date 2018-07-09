@@ -18,13 +18,14 @@ EventLoop::EventLoop()
           looping_(false),
           eventHandling_(false),
           callingPendingFunctor_(false),
-          threadId_(gettid()),
+          threadId_(gettid),
           wakeupFd(createEventfd()),
           currentActiveChannel(nullptr),
           wakeupChannel_(new Channel(this, wakeupFd)),
           poller_(std::make_shared<EpollPoller>(this))
 {
-    wakeupChannel_->setReadCB(std::bind(EventLoop::handleRead));
+    printf("...EventLoop()\n");
+    wakeupChannel_->setReadCB(std::bind(&EventLoop::handleRead, this));
     wakeupChannel_->enableRead();
 }
 
@@ -42,12 +43,14 @@ void EventLoop::loop() {
 
     while (!quit_) {
         activeChannels_.clear();
-        poller_->poll(CPollTimeMs, activeChannels_);
-
+        printf("...wait for poll back\n");
+        poller_->poll(-1, &activeChannels_);
+        printf("... poll back, active channel size: %d\n", activeChannels_.size());
         eventHandling_ = true;
         for (std::vector<Channel *>::iterator it = activeChannels_.begin();
                 it != activeChannels_.end(); ++it) {
             currentActiveChannel = *it;
+            printf("...handle channel event\n");
             currentActiveChannel->handleEvent();
         }
         currentActiveChannel = NULL;
@@ -113,7 +116,7 @@ void EventLoop::removeChannel(Channel *channel) {
     assert(isInLoopThread());
     if (eventHandling_) {
         assert(currentActiveChannel == channel
-        || std::find(activeChannels_.begin(), activeChannels_.end(), channel) == activeChannels_.end());
+        /*|| std::find(activeChannels_.begin(), activeChannels_.end(), channel) == activeChannels_.end()*/);
     }
     poller_->removeChannel(channel);
 }

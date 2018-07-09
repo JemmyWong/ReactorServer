@@ -6,8 +6,8 @@
 #include "Channel.h"
 
 const int Channel::CNoneEvent = 0;
-const int Channel::CReadEvent = POLLIN | POLLPRI;
-const int Channel::CWriteEvent = POLLOUT;
+const int Channel::CReadEvent = EPOLLIN | EPOLLPRI;
+const int Channel::CWriteEvent = EPOLLOUT;
 
 Channel::Channel(EventLoop *loop, int fd)
         : loop_(loop),
@@ -60,17 +60,17 @@ void Channel::handleEventWithGuard() {
         if (closeCallback_) closeCallback_();
     }*/
 
-    if (rcvEvents_ & POLLNVAL) {
+    /*if (rcvEvents_ & EPOLLNVAL) {
         std::cout << "fd = " << fd_ << " Channel::handle_event() POLLNVAL" << std::endl;
-    }
+    }*/
 
-    if (rcvEvents_ & (POLLERR | POLLNVAL)) {
+    if (rcvEvents_ & (EPOLLERR)) {
         if (errorCB_) errorCB_();
     }
-    if (rcvEvents_ & (POLLIN | POLLPRI | POLLRDHUP)) {
+    if (rcvEvents_ & (EPOLLIN | EPOLLPRI | EPOLLRDHUP)) {
         if (readCB_) readCB_();
     }
-    if (rcvEvents_ & POLLOUT) {
+    if (rcvEvents_ & EPOLLOUT) {
         if (writeCB_) writeCB_();
     }
     eventHandling_ = false;

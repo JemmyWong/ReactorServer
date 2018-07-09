@@ -8,12 +8,14 @@
 
 #include "EventLoop.h"
 
+class EventLoop;
+
 class Channel {
 public:
-    typedef EventLoop::Functor Functor;
+    typedef std::function<void()> Functor;
 
     Channel(EventLoop *, int);
-    Channel(Channel &) = delete; /* non-copyable */
+//    Channel(Channel &) = delete; /* non-copyable */
     ~Channel();
 
     /* Tie this channel to the owner object managed by shared_ptr,
@@ -22,7 +24,7 @@ public:
     EventLoop *ownerLoop() { return loop_; }
 
     void handleEvent();
-    void setReadCB(const Functor &func)  { readCB_ = func; }
+    void setReadCB(const Functor &func)  { readCB_ = func; printf("...setReadCB()");}
     void setWriteCB(const Functor &func) { writeCB_ = func; }
     void setErrorCB(const Functor &func) { errorCB_ = func; }
 
@@ -35,7 +37,7 @@ public:
 
     void remove();
     void update();
-    void enableRead()   { events_ |= CReadEvent; update(); }
+    void enableRead()   { events_ |= CReadEvent; printf("...enableRead()\n");update(); }
     void disableRead()  { events_ &= ~CReadEvent; update(); }
     void enableWrite()  { events_ |= CWriteEvent; update(); }
     void disableWrite() { events_ &= CWriteEvent; update(); }
@@ -49,7 +51,7 @@ private:
 
     EventLoop *loop_;
     const int fd_;
-    int index_;
+    int index_;     /* status: CNew, CAdded, CDeleted */
     int events_;
     int rcvEvents_;
     std::weak_ptr<void> tie_;

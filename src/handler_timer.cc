@@ -1,4 +1,7 @@
-#include <unistd.h> /* alarm */
+/*
+#include <unistd.h> */
+/* alarm *//*
+
 
 #include "timer.h"
 #include "../v0.1/eventhandler.h"
@@ -38,4 +41,4 @@ event_handler_t *create_timer_handler(reactor_t *reactor) {
     printf("call alarm(%d)\n", timerHeap->top()->expire + 2);
     alarm(timerHeap->top()->expire + 2);
     return eh;
-}
+}*/

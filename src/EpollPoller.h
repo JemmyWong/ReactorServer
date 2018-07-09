@@ -10,13 +10,16 @@
 #include <map>
 #include <vector>
 
+class EventLoop;
+class Channel;
+
 class EpollPoller {
 public:
     EpollPoller(EventLoop *);
     EpollPoller(EpollPoller &) = delete;
     ~EpollPoller();
 
-    void poll(int ms, std::vector<Channel *> activeChannels);
+    void poll(int ms, std::vector<Channel *> *activeChannels);
     void update(int op, Channel *channel);
     bool hasChannel(Channel *channel);
     void updateChannel(Channel *channel);
@@ -24,7 +27,7 @@ public:
 private:
     typedef std::map<int, Channel *>    ChannelMap;
 
-    void fillActiveChannel(int num, std::vector<Channel *> activeChannel);
+    void fillActiveChannel(int num, std::vector<Channel *> *activeChannel);
 
     EventLoop                           *ownerLoop_;
     int                                 epollFd;

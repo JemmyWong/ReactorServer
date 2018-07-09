@@ -1,3 +1,4 @@
+/*
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -73,7 +74,9 @@ int send_to_fd(int socket_fd, char *send_buf, int send_len) {
 }
 
 
-/* handle client fd event */
+*/
+/* handle client fd event *//*
+
 void handle_client_event(handle_event_msg_t *handle_event_msg) {
     event_handler_t *eh = handle_event_msg->eh;
     int e = handle_event_msg->e;
@@ -107,7 +110,8 @@ void handle_client_event(handle_event_msg_t *handle_event_msg) {
 //        ret = recv(eh->fd, msgBuf, 4096, 0);
 
 
-        /*ret = recv_from_fd(eh->fd, msgBuf, &recv_len);
+        */
+/*ret = recv_from_fd(eh->fd, msgBuf, &recv_len);
         if (recv_len > 4096) {
             printf("error recv from fd<%d> buffer overflow, recv_len: %d\n", eh->fd, recv_len);
         }
@@ -125,7 +129,8 @@ void handle_client_event(handle_event_msg_t *handle_event_msg) {
 
         free(package);
         free(receive_msg);
-        free(handle_event_msg);*/
+        free(handle_event_msg);*//*
+
 
 
         if (eh->httpConn->read()) {
@@ -144,7 +149,9 @@ void handle_client_event(handle_event_msg_t *handle_event_msg) {
     }
 }
 
-/* create client fd event_handler */
+*/
+/* create client fd event_handler *//*
+
 event_handler_t *create_client_handler(int fd, reactor_t *reactor) {
     event_handler_t *eh = (event_handler_t *)malloc(sizeof(event_handler_t));
     eh->fd = fd;
@@ -156,7 +163,9 @@ event_handler_t *create_client_handler(int fd, reactor_t *reactor) {
     return eh;
 }
 
-/* handle listen fd event */
+*/
+/* handle listen fd event *//*
+
 void handle_listen_event(handle_event_msg_t *handle_event_msg) {
     event_handler_t *eh = handle_event_msg->eh;
     int e = handle_event_msg->e;
@@ -165,10 +174,14 @@ void handle_listen_event(handle_event_msg_t *handle_event_msg) {
     socklen_t  cli_adrr_len = sizeof(cli_addr);
     memset(&cli_addr, 0, sizeof(cli_addr));
 
-    /* accept client connection */
+    */
+/* accept client connection *//*
+
     int cli_fd = accept(eh->fd, (struct sockaddr *)&cli_addr, &cli_adrr_len);
 
-    /* listen client event handler */
+    */
+/* listen client event handler *//*
+
     event_handler_t *ceh = create_client_handler(cli_fd, eh->reactor);
     ceh->httpConn = new HttpConn();
     ceh->httpConn->init(cli_fd, cli_addr);
@@ -179,7 +192,9 @@ void handle_listen_event(handle_event_msg_t *handle_event_msg) {
     free(handle_event_msg);
 }
 
-/* create listen fd event_handler */
+*/
+/* create listen fd event_handler *//*
+
 event_handler_t *create_listen_handler(int fd, reactor_t *reactor) {
     printf("create event_handler of fd[%d]\n", fd);
 
@@ -193,3 +208,4 @@ event_handler_t *create_listen_handler(int fd, reactor_t *reactor) {
 
 
 
+*/

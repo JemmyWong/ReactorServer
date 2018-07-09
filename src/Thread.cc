@@ -18,7 +18,7 @@ struct ThreadData {
             :func(func_), name(name_), tid(tid_), latch(latch_) {}
 
     void runInThread() {
-        *tid = gettid();
+        *tid = gettid;
         tid = NULL;
         latch->countDown();
         latch = NULL;
@@ -90,6 +90,7 @@ void func() {
     printf("Thread init function...\n");
 }
 
+/*
 int main() {
     Thread thread1(std::bind(func));
     Thread thread2(std::bind(func));
@@ -102,4 +103,4 @@ int main() {
     thread1.join();
     thread2.join();
     thread3.join();
-}
+}*/

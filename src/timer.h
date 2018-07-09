@@ -1,3 +1,4 @@
+/*
 #ifndef _TIMER_H_
 #define _TIMER_H_
 
@@ -8,11 +9,12 @@
 #include <pthread.h>
 
 #include <algorithm>
-#include <utility>  /* swap */
+#include <utility>  */
+/* swap *//*
+
 
 #include "slog.h"
 #include "Mutex.h"
-#include "../v0.1/eventhandler.h"
 
 using std::exception;
 
@@ -24,7 +26,9 @@ void handle_timer_event(handle_event_msg_t *handle_event_msg);
 
 event_handler_t *create_timer_handler(reactor_t *reactor);
 
-/* provided for handle_timer.cc */
+*/
+/* provided for handle_timer.cc *//*
+
 void addTimer(int delay);
 
 struct ClientData {
@@ -76,12 +80,16 @@ private:
 
     void resize() throw (std::exception);
 private:
-    Timer   **array;    /* time heap array */
+    Timer   **array;    */
+/* time heap array *//*
+
     int     capacity;
     int     cur_size;
-    /* lock heap when add, del timer */
+    */
+/* lock heap when add, del timer *//*
+
 //    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
     MutexLock mutex;
 };
 
-#endif
+#endif*/

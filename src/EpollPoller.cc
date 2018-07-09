@@ -2,6 +2,7 @@
  * Created by Jemmy on 2018/7/8.
  *
  */
+#include "EpollPoller.h"
 
 EpollPoller::EpollPoller(EventLoop *loop)
         :  ownerLoop_(loop),
@@ -11,11 +12,14 @@ EpollPoller::EpollPoller(EventLoop *loop)
     assert(epollFd > 0);
 }
 
-#include "EpollPoller.h"
+EpollPoller::~EpollPoller() {
 
-void EpollPoller::poll(int ms, std::vector<Channel *> activeChannels) {
+}
+
+void EpollPoller::poll(int ms, std::vector<Channel *> *activeChannels) {
     int num = epoll_wait(epollFd, &*eventVec.begin(),
             static_cast<int>(eventVec.size()), ms);
+    printf("...epoll_wait size: %d\n", num);
     if (num > 0) {
         fillActiveChannel(num, activeChannels);
         if (static_cast<size_t >(num) == eventVec.size()) {
@@ -28,22 +32,24 @@ void EpollPoller::poll(int ms, std::vector<Channel *> activeChannels) {
     }
 }
 
-void EpollPoller::fillActiveChannel(int num, std::vector<Channel *> activeChannel) {
+void EpollPoller::fillActiveChannel(int num, std::vector<Channel *> *activeChannel) {
     assert(static_cast<size_t >(num) < eventVec.size());
     for (int i = 0; i < num; ++i) {
         Channel *ch = static_cast<Channel *>(eventVec[i].data.ptr);
         int fd = ch->getFd();
+        printf("fd: %d\n", fd);
         ChannelMap::const_iterator it = channels_.find(fd);
         assert(it != channels_.end());
         assert(it->second == ch);
 
         ch->setEvents(eventVec[i].events);
-        activeChannel.push_back(ch);
+        activeChannel->push_back(ch);
     }
 }
 
 
 void EpollPoller::updateChannel(Channel *channel) {
+    printf("...updataChannel()");
     int index = channel->getIndex();
     int fd = channel->getFd();
     if (index == CNew || index == CDeleted) {
@@ -66,6 +72,7 @@ void EpollPoller::updateChannel(Channel *channel) {
             update(EPOLL_CTL_MOD, channel);
         }
     }
+    printf("ChannelMap:<%d,%d>\n", fd, channels_[fd]);
 }
 
 /* not remove Channel really, just mark it as CNew */
@@ -84,6 +91,7 @@ void EpollPoller::removeChannel(Channel *channel) {
 }
 
 void EpollPoller::update(int op, Channel *channel) {
+    printf("...updata(), op: %d\n", op);
     struct epoll_event ev;
     memset(&ev, 0, sizeof(ev));
     ev.events = channel->getEvents();

@@ -1,3 +1,4 @@
+/*
 #include "timer.h"
 #include "Mutex.h"
 
@@ -134,4 +135,4 @@ void TimerHeap::resize() throw (std::exception) {
     }
     delete [] array;
     array = tmp;
-}
+}*/

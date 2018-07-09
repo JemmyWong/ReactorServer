@@ -1,3 +1,4 @@
+/*
 #include "slog.h"
 #include "timer.h"
 #include "../v0.1/server.h"
@@ -13,13 +14,18 @@ static int pipefd[2];
 extern int timerPipeFd[2];
 
 void sig_handler(int sig) {
-    /* save old errno to ensure the function's reentrancy */
+    */
+/* save old errno to ensure the function's reentrancy *//*
+
     int signal = sig;
     int save_error = errno;
-    send(pipefd[1], &signal, sizeof(sig), 0);   /* send sig to pipe to info main loop */
+    send(pipefd[1], &signal, sizeof(sig), 0);   */
+/* send sig to pipe to info main loop *//*
+
     errno = save_error;
 }
 
+*/
 /*
  * struct sigaction {
       void (*sa_handler)(int); // SIG_IGN, SIG_DFL
@@ -29,9 +35,12 @@ void sig_handler(int sig) {
       void (*sa_restorer)(void);
     };
  *
- * */
+ * *//*
 
-/* register sig with the system */
+
+*/
+/* register sig with the system *//*
+
 void addsig(int sig) {
     struct sigaction sa;
     memset(&sa, '\0', sizeof(sa));
@@ -81,4 +90,4 @@ event_handler_t *create_signal_handler(reactor_t *reactor, int sig) {
     printf("create signal handler <%d>\n", sig);
 
     return eh;
-}
+}*/

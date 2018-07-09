@@ -18,12 +18,17 @@
 #include "Mutex.h"
 #include "Channel.h"
 #include "EpollPoller.h"
+#include "CommonUtil.h"
+
+class Channel;
+class EpollPoller;
+
 class EventLoop {
 public:
-    typedef std::function<void()> Functor;
+    typedef std::function<void()>       Functor;
 
     EventLoop();
-    EventLoop(EventLoop &) = delete;
+//    EventLoop(EventLoop &) = delete;
     ~EventLoop();
 
     void loop();
@@ -32,15 +37,16 @@ public:
 
     void quit();
     void wakeup();
-    void handleRead();
     void doPendingFunctors();
     /* Channel modified in EpollPoller finally which own them */
     bool hasChannel(Channel *channel);
     void updateChannel(Channel *channel);
     void removeChannel(Channel *channel);
+    bool isInLoopThread() { return threadId_ == gettid; }
 
-    bool isInLoopThread() { return threadId_ == gettid(); }
 private:
+    void handleRead();
+
     bool        quit_;
     bool        looping_;
     bool        eventHandling_;
