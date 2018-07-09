@@ -1,3 +1,4 @@
+
 //
 // Created by by on 2018/7/9.
 //
@@ -11,13 +12,14 @@
 
 using namespace std;
 
-EventLoop *gLoop = nullptr;
+/*EventLoop *gLoop = nullptr;
 
 void timeout() {
     printf("Timeout....\n");
     gLoop->quit();
-}
+}*/
 
+/*
 int main() {
     EventLoop loop;
     gLoop = &loop;
@@ -35,4 +37,7 @@ int main() {
     loop.loop();
 
     close(timerFd);
+
 }
+
+*/

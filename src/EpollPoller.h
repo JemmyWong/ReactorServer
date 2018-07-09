@@ -30,10 +30,10 @@ private:
     void fillActiveChannel(int num, std::vector<Channel *> *activeChannel);
 
     EventLoop                           *ownerLoop_;
-    int                                 epollFd;
+    int                                 epollFd_;
     ChannelMap                          channels_;
 
-    std::vector<struct epoll_event> eventVec;
+    std::vector<struct epoll_event> eventVec_;
 
     static const int CNew = -1;
     static const int CAdded = 1;

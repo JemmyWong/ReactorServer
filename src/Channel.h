@@ -24,7 +24,7 @@ public:
     EventLoop *ownerLoop() { return loop_; }
 
     void handleEvent();
-    void setReadCB(const Functor &func)  { readCB_ = func; printf("...setReadCB()");}
+    void setReadCB(const Functor &func)  { readCB_ = func; }
     void setWriteCB(const Functor &func) { writeCB_ = func; }
     void setErrorCB(const Functor &func) { errorCB_ = func; }
 
@@ -33,11 +33,11 @@ public:
     int getEvents() { return events_; }
 
     int setIndex(int idx) { index_ = idx; }
-    int setEvents(int e) { events_ = e; }
+    int setEvents(int e) { rcvEvents_ = e; }
 
     void remove();
     void update();
-    void enableRead()   { events_ |= CReadEvent; printf("...enableRead()\n");update(); }
+    void enableRead()   { events_ |= CReadEvent; update(); }
     void disableRead()  { events_ &= ~CReadEvent; update(); }
     void enableWrite()  { events_ |= CWriteEvent; update(); }
     void disableWrite() { events_ &= CWriteEvent; update(); }
@@ -49,11 +49,11 @@ public:
 private:
     void handleEventWithGuard();
 
-    EventLoop *loop_;
-    const int fd_;
-    int index_;     /* status: CNew, CAdded, CDeleted */
-    int events_;
-    int rcvEvents_;
+    EventLoop           *loop_;
+    const int           fd_;
+    int                 index_;     /* status: CNew, CAdded, CDeleted */
+    int                 events_;
+    int                 rcvEvents_;
     std::weak_ptr<void> tie_;
 
     bool tied_;

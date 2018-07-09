@@ -43,14 +43,12 @@ void EventLoop::loop() {
 
     while (!quit_) {
         activeChannels_.clear();
-        printf("...wait for poll back\n");
-        poller_->poll(-1, &activeChannels_);
+        poller_->poll(CPollTimeMs, &activeChannels_);
         printf("... poll back, active channel size: %d\n", activeChannels_.size());
         eventHandling_ = true;
         for (std::vector<Channel *>::iterator it = activeChannels_.begin();
                 it != activeChannels_.end(); ++it) {
             currentActiveChannel = *it;
-            printf("...handle channel event\n");
             currentActiveChannel->handleEvent();
         }
         currentActiveChannel = NULL;
@@ -102,7 +100,7 @@ void EventLoop::wakeup() {
 
 bool EventLoop::hasChannel(Channel *channel) {
     assert(channel->ownerLoop() == this);
-    poller_->hasChannel(channel);
+    return poller_->hasChannel(channel);
 }
 
 void EventLoop::updateChannel(Channel *channel) {
