@@ -75,7 +75,7 @@ void EventLoop::doPendingFunctors() {
     callingPendingFunctor_ = false;
 }
 
-void EventLoop::runInLoop(const EventLoop::Functor func) {
+void EventLoop::runInLoop(const EventLoop::Functor &func) {
     if (isInLoopThread()) {
         func();
     } else {
@@ -83,7 +83,7 @@ void EventLoop::runInLoop(const EventLoop::Functor func) {
     }
 }
 
-void EventLoop::queueInLoop(const EventLoop::Functor func) {
+void EventLoop::queueInLoop(const EventLoop::Functor &func) {
     {
         MutexLockGuard lock(mutex_);
         pendingFunctor_.push_back(func);

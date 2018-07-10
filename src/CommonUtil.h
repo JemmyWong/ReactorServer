@@ -18,6 +18,8 @@
 #include <sys/types.h>
 #include <pthread.h>
 #include <sys/syscall.h>
+#include <functional>
+#include <memory>
 
 #ifdef SYS_gettid
 #define gettid syscall(SYS_gettid)
@@ -32,5 +34,14 @@ int setNonBlock(int fd);
 void addFd(int epollFd, int fd, bool oneShot);
 void removeFd(int epollFd, int fd);
 void modFd(int epollFd, int fd, int ev);
+
+class TcpConnection;
+
+typedef std::shared_ptr<TcpConnection> TcpConnectioinPtr;
+typedef std::function<void(const TcpConnectioinPtr &)> CloseCB;
+typedef std::function<void(const TcpConnectioinPtr &)> ConnectionCB;
+typedef std::function<void(const TcpConnectioinPtr &)> WriteCompleteCB;
+typedef std::function<void(const TcpConnectioinPtr &, const char *, int len)> MessageCB;
+
 
 #endif //PROJECT_COMMONUTIL_H

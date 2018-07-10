@@ -27,6 +27,7 @@ public:
     void setReadCB(const Functor &func)  { readCB_ = func; }
     void setWriteCB(const Functor &func) { writeCB_ = func; }
     void setErrorCB(const Functor &func) { errorCB_ = func; }
+    void setCloseCB(const Functor &func) { closeCB_ = func; }
 
     int getFd() {return fd_; }
     int getIndex() { return index_; }
@@ -63,6 +64,7 @@ private:
     Functor readCB_;
     Functor writeCB_;
     Functor errorCB_;
+    Functor closeCB_;
 
     static const int CNoneEvent;
     static const int CReadEvent;

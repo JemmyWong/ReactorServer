@@ -32,8 +32,8 @@ public:
     ~EventLoop();
 
     void loop();
-    void runInLoop(const Functor func);
-    void queueInLoop(const Functor func);
+    void runInLoop(const Functor &func);
+    void queueInLoop(const Functor &func);
 
     void quit();
     void wakeup();
