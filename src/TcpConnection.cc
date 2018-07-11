@@ -85,6 +85,16 @@ void TcpConnection::connectionEstablished() {
     connectionCB_(shared_from_this());
 }
 
+void TcpConnection::connectionDestroyed() {
+    assert(loop_->isInLoopThread());
+    if (state_ == CConnected) {
+        setState(CDisconnected);
+        channel_->disableAll();
+        connectionCB_(shared_from_this());
+    }
+    channel_->remove();
+}
+
 void TcpConnection::handleRead() {
     assert(loop_->isInLoopThread());
     int byteRead = 0;
@@ -97,21 +107,69 @@ void TcpConnection::handleRead() {
             return;
         }
         readIdx_ += byteRead;
-        if (readIdx_ > READ_BUFFER_SIZE)
+        if (readIdx_ > READ_BUFFER_SIZE) {
+            printf("WARNING: TcpConnection fd[%d] readBuf_ overflow\n", channel_->getFd());
             return;
+        }
     }
 }
 
+// TODO
 void TcpConnection::handleWrite() {
-
+    assert(loop_->isInLoopThread);
+    if (channel_->isWriting()) {
+        int tmp = 0;
+        int bytes_have_send = 0;
+        int bytes_to_send = writeIdx_;
+        if (bytes_to_send == 0) {
+//            modFd(epollFd, sockFd, EPOLLIN);
+            channel_->enableRead();
+        }
+        bool ret = false;
+        while (true) {
+            tmp = writev(sockFd, iv, ivCount);
+            if (tmp <= -1) {
+                /* if there is no space in TCP buffer, wait for next EPOLLOUT event,
+                 * even through server can't accept next request from the same fd immediately,
+                 * but we can make sure complete connection */
+                if (errno == EAGAIN) {
+//                    modFd(epollFd, sockFd, EPOLLOUT);
+                    channel_->enableWrite();
+                }
+                unmap();
+            }
+            bytes_to_send -= tmp;
+            bytes_have_send += tmp;
+            if (bytes_to_send <= bytes_have_send) {
+                unmap();
+                // TODO linger
+//                if (linger) {
+//                    init();
+//                    modFd(epollFd, sockFd, EPOLLIN);
+//                    return true;
+//                }
+            } else {
+//                modFd(epollFd, sockFd, EPOLLIN);
+                channel_->enableRead();
+            }
+        }
+    }
 }
 
 void TcpConnection::handleClose() {
+    assert(loop_->isInLoopThread());
+    assert(state_ == CConnected || state_ == CConnecting);
+    // we don't close fd, leave it to dtor, so we can find leaks easily.
+    setState(CDisconnected);
+    channel_->disableAll();
 
+    TcpConnectioinPtr guardThis(shared_from_this());
+    connectionCB_(guardThis);
+    closeCB_(guardThis);
 }
 
 void TcpConnection::handleError() {
-
+    printf("TcpConnection Fd[%d] Error: %s\n", sockFd_, strerror(errno));
 }
 
 void TcpConnection::startRead() {

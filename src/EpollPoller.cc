@@ -75,7 +75,6 @@ void EpollPoller::updateChannel(Channel *channel) {
     printf("ChannelMap:<%d,%d>\n", fd, channels_[fd]);
 }
 
-/* not remove Channel really, just mark it as CNew */
 void EpollPoller::removeChannel(Channel *channel) {
     int fd = channel->getFd();
     int index = channel->getIndex();

@@ -34,9 +34,9 @@ public:
         closeCB_ = cb;
     }
     void connectionEstablished();
+    void connectionDestroyed();
 
     void send();
-    void write();
     void stopRead();
     void startRead();
     void sendInLoop();
