@@ -21,6 +21,7 @@
 class Acceptor {
 public:
     typedef std::function<void(int fd, const struct sockaddr_in *peerAddr)> NewConnectionCB;
+
     Acceptor(EventLoop *, const std::string &);
     ~Acceptor();
 

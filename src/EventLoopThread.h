@@ -16,6 +16,7 @@ public:
     explicit EventLoopThread(const ThreadInitCB &cb = ThreadInitCB(), std::string = std::string());
     ~EventLoopThread();
     EventLoop *startLoop();
+
 private:
     void threadFunc();
 
@@ -24,8 +25,7 @@ private:
     MutexLock       mutex_;
     Condition       cond_;
     bool            exiting_;
-    ThreadInitCB    threadCB_;
-
+    ThreadInitCB    threadCB_; /* called when thread create */
 };
 
 #endif //PROJECT_EVENTLOOPTHREAD_H

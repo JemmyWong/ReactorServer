@@ -21,20 +21,33 @@ public:
     TcpConnection(EventLoop *loop, const std::string &name, int fd);
     ~TcpConnection();
 
-    void setConnectionCB(const ConnectionCB &cb) {
-        connectionCB_ = cb;
+    void setCloseCB(const CloseCB &cb) {
+        closeCB_ = cb;
     }
     void setMessageCb(const MessageCB &cb) {
         messageCB_ = cb;
     }
+    void setConnectionCB(const ConnectionCB &cb) {
+        connectionCB_ = cb;
+    }
     void setWriteCompleteCB(const WriteCompleteCB &cb) {
         writeCompleteCB_ = cb;
     }
-    void setCloseCB(const CloseCB &cb) {
-        closeCB_ = cb;
+    void setContext(void *context) {
+        context_ = context;
     }
-    void connectionEstablished();
+
+    EventLoop *getLoop() { return loop_; }
+    const std::string getName() { return name_; }
+    void *getContext() const {
+        return context_;
+    }
+    void *getMutableContext() {
+        return context_;
+    }
+
     void connectionDestroyed();
+    void connectionEstablished();
 
     void send();
     void stopRead();
@@ -50,7 +63,6 @@ private:
 
     void stopReadInLoop();
     void startReadInLoop();
-    void sendInLoop(const void *message, size_t len);
     void setState(State &s) { state_ = s; }
 
     EventLoop                   *loop_;
@@ -61,6 +73,7 @@ private:
     bool                        reading_;
     int                         readIdx_;
     int                         writeIdx_;
+    void                        *context_;
     char                        readBuf_[READ_BUFFER_SIZE];
     char                        writeBuf_[WRITE_BUFFER_SIZE];
 

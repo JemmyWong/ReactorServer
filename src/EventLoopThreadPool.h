@@ -14,14 +14,16 @@ public:
     typedef std::function<void(EventLoop *)> ThreadInitCB;
     typedef std::shared_ptr<EventLoopThread> EventLoopThreadPtr;
 
-    EventLoopThreadPool(const EventLoop *loop, const std::string name = std:string());
-    ~EventLoopThreadPool();
+    EventLoopThreadPool(EventLoop *loop, const std::string &name);
+
+    /* loops are stack variable no need to delete */
+    ~EventLoopThreadPool() = default;
 
     void setNumThreads(int num) { numThreads_ = num; }
 
     void start(const ThreadInitCB &cb = ThreadInitCB());
 
-    EvnetLoop *getNextLoop();
+    EventLoop *getNextLoop();
 
     bool started() { return started_; }
 private:
@@ -31,7 +33,7 @@ private:
     int                         numThreads_;
     bool                        started_;
     std::vector<EventLoopThreadPtr> threads_;
-    std::vector<EventLoop *>    loops_;
+    std::vector<EventLoop *>    loops_;         /* stack variables */
 };
 
 #endif //PROJECT_EVENTLOOPTHREADPOOL_H

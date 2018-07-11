@@ -8,22 +8,22 @@
 struct ThreadData {
     typedef Thread::ThreadFunc ThreadFunc;
 
-    ThreadFunc      func;
-    std::string     name;
-    pid_t           *tid;
-    CountDownLatch  *latch;
+    ThreadFunc      func_;
+    std::string     name_;
+    pid_t           *tid_;
+    CountDownLatch  *latch_;
 
-    ThreadData(const ThreadFunc &func_, std::string name_,
-               pid_t *tid_, CountDownLatch *latch_)
-            :func(func_), name(name_), tid(tid_), latch(latch_) {}
+    ThreadData(const ThreadFunc &func, std::string name,
+               pid_t *tid, CountDownLatch *latch)
+            :func_(func), name_(name), tid_(tid), latch_(latch) {}
 
     void runInThread() {
-        *tid = gettid;
-        tid = NULL;
-        latch->countDown();
-        latch = NULL;
+        *tid_ = gettid;
+        tid_ = NULL;
+        latch_->countDown();
+        latch_ = NULL;
 
-        if (func) func();
+        if (func_) func_(); /* ThreadInitCB */
     }
 };
 

@@ -6,7 +6,7 @@
 #include "EventLoopThread.h"
 
 EventLoopThread::EventLoopThread(const EventLoopThread::ThreadInitCB &cb, const std::string name = std::string())
-        : loop_(NULL),
+        : loop_(nullptr),
           thread_(std::bind(&EventLoopThread::threadFunc, this), name),
           mutex_(),
           cond_(mutex_),
@@ -16,7 +16,7 @@ EventLoopThread::EventLoopThread(const EventLoopThread::ThreadInitCB &cb, const 
 
 EventLoopThread::~EventLoopThread() {
     exiting_ = true;
-    if (loop_ != NULL) {
+    if (loop_ != nullptr) {
         loop_->quit();
         thread_.join();
     }
@@ -34,15 +34,16 @@ void EventLoopThread::threadFunc() {
     }
 
     loop_->loop();
-    loop_ = NULL;
+    loop_ = nullptr;
 }
 
 EventLoop *EventLoopThread::startLoop() {
     assert(thread_.isStart());
     thread_.start();
     {
+        /* wait for thread routing to create loop_ */
         MutexLockGuard lock(mutex_);
-        while (loop_ == NULL) {
+        while (loop_ == nullptr) {
             cond_.wait();
         }
     }

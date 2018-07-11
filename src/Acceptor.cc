@@ -12,12 +12,13 @@ int createNonBlockingFd(const std::string addr) {
 
     struct sockaddr_in local;
     local.sin_family = AF_INET;
-    local.sin_port = htons(9000);
-    local.sin_addr.s_addr = INADDR_ANY;
+    local.sin_port = htons(addr.c_str());
+    local.sin_addr.s_addr = INADDR_ANY; /* inet_addr("0.0.0.0") */
 
-    int n = bind(fd, reinterpret_cast<struct sockaddr *>(&local), sizeof(local));
+    int n = bind(fd, static_cast<struct sockaddr *>(&local), sizeof(local));
     if (n < 0) {
         printf("bind error: %s\n", strerror(errno));
+        exit(1);
     }
     assert(n >= 0);
 
@@ -33,19 +34,18 @@ Acceptor::Acceptor(EventLoop *loop, const std::string &addr)
           listening_(true)
 {
     printf("...Acceptor()\n");
+    /* EPOLLIN means a new sock connection event */
     acceptChannel_.setReadCB(std::bind(&Acceptor::handleRead, this));
     acceptChannel_.enableRead();
 }
 
-Acceptor::~Acceptor() {
-
-}
+Acceptor::~Acceptor() = default;
 
 void Acceptor::handleRead() {
     assert(loop_->isInLoopThread());
     struct sockaddr_in peerAddr;
     socklen_t len = sizeof(peerAddr);
-    int newFd = accept(sockFd_, reinterpret_cast<struct sockaddr *>(&peerAddr), &len);
+    int newFd = accept(sockFd_, static_cast<struct sockaddr *>(&peerAddr), &len);
     if (newFd > 0) {
         if (newConnectionCB_) {
             newConnectionCB_(newFd, &peerAddr);
@@ -53,8 +53,6 @@ void Acceptor::handleRead() {
     } else {
         printf("accept() failed...\n");
     }
-
-
 }
 
 

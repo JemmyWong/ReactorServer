@@ -36,12 +36,14 @@ void removeFd(int epollFd, int fd);
 void modFd(int epollFd, int fd, int ev);
 
 class TcpConnection;
+class EventLoop;
 
-typedef std::shared_ptr<TcpConnection> TcpConnectioinPtr;
-typedef std::function<void(const TcpConnectioinPtr &)> CloseCB;
-typedef std::function<void(const TcpConnectioinPtr &)> ConnectionCB;
-typedef std::function<void(const TcpConnectioinPtr &)> WriteCompleteCB;
-typedef std::function<void(const TcpConnectioinPtr &, const char *, int len)> MessageCB;
+typedef std::function<void(EventLoop *)> ThreadInitCB;
+typedef std::shared_ptr<TcpConnection> TcpConnectionPtr;
+typedef std::function<void(const TcpConnectionPtr &)> CloseCB;
+typedef std::function<void(const TcpConnectionPtr &)> ConnectionCB;
+typedef std::function<void(const TcpConnectionPtr &)> WriteCompleteCB;
+typedef std::function<void(const TcpConnectionPtr &, const char *, int len)> MessageCB;
 
 
 #endif //PROJECT_COMMONUTIL_H
