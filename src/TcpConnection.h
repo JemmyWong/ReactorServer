@@ -14,6 +14,7 @@
 #include <sys/uio.h>    /* struct iovec */
 #include <sys/types.h>
 #include <sys/socket.h>
+#include "HttpContext.h"
 
 
 static const int READ_BUFFER_SIZE = 1024;
@@ -36,16 +37,16 @@ public:
     void setWriteCompleteCB(const WriteCompleteCB &cb) {
         writeCompleteCB_ = cb;
     }
-    void setContext(void *context) {
+    void setContext(std::shared_ptr<void> &context) {
         context_ = context;
     }
 
     EventLoop *getLoop() { return loop_; }
     const std::string getName() { return name_; }
-    void *getContext() const {
+    std::shared_ptr<HttpContext> getContext() const {
         return context_;
     }
-    void *getMutableContext() {
+    std::shared_ptr<HttpContext> getMutableContext() {
         return context_;
     }
 
@@ -77,7 +78,7 @@ private:
     bool                        reading_;
     int                         readIdx_;
     int                         writeIdx_;
-    void                        *context_;
+    std::shared_ptr<HttpContext>context_;
     struct stat                 fileState_;
     struct iovec                iv_[2];
     char                        readBuf_[READ_BUFFER_SIZE];

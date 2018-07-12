@@ -17,7 +17,8 @@
 
 class TcpServer {
 public:
-    TcpServer(EventLoop *loop, const std::string name);
+    TcpServer(EventLoop *loop,
+              const std::string name = std::string(), const std::string port = "9000");
     ~TcpServer();
 
     void setThreadNum(int num);
@@ -36,10 +37,11 @@ public:
         threadInitCB_ = cb;
     }
 
+    EventLoop *getLoop() { return loop_; }
 private:
     typedef std::map<std::string, TcpConnectionPtr> ConnectionMap;
 
-    void newConnection(int sockFd, const void *peerAddr);
+    void newConnection(int sockFd, void *peerAddr);
     void removeConnection(const TcpConnectionPtr &conn);
     void removeConnectionInLoop(const TcpConnectionPtr &conn);
 

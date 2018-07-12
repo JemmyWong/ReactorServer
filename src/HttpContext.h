@@ -6,8 +6,23 @@
 #ifndef PROJECT_HTTPCONTEXT_H
 #define PROJECT_HTTPCONTEXT_H
 
-class HttpContext {
+#include "HttpRequest.h"
 
+class HttpContext {
+public:
+    /* use state machine to parse requestLine, head and content */
+    bool parseRequest(const char *buf, int len);
+private:
+    char * getLine();
+    LineStatus parseLine();
+
+    char        *buf_;
+    int         readIdx_;
+    int         checkedIdx_;
+    int         startLine_;
+    HttpCode    httpCode_;
+    CheckState  checkState_;
+    HttpRequest request_;
 };
 
 #endif //PROJECT_HTTPCONTEXT_H

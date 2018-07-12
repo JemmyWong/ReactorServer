@@ -37,6 +37,8 @@ void modFd(int epollFd, int fd, int ev);
 
 class TcpConnection;
 class EventLoop;
+class HttpRequest;
+class HttpResponse;
 
 typedef std::function<void(EventLoop *)> ThreadInitCB;
 typedef std::shared_ptr<TcpConnection> TcpConnectionPtr;
@@ -45,5 +47,28 @@ typedef std::function<void(const TcpConnectionPtr &)> ConnectionCB;
 typedef std::function<void(const TcpConnectionPtr &)> WriteCompleteCB;
 typedef std::function<void(const TcpConnectionPtr &, const char *, int len)> MessageCB;
 
+typedef std::function<void(const HttpRequest &, HttpResponse *)> HttpCB;
+
+/* http request method, only support GET */
+enum Method {GET = 0, POST, HEAD, PUT, DELETE,
+    TRACE, OPTIONS, CONNECT, PATCH};
+
+/* state of the state machine */
+enum CheckState {CHECK_STATE_REQUESTLINE = 0,
+    CHECK_STATE_HEADER, CHECK_STATE_CONTENT};
+
+/* result of http request processed */
+enum HttpCode { NO_REQUEST, GET_REQUEST, BAD_REQUEST,
+    NO_RESOURCE, FORBIDDEN_REQUEST,_REQUEST, FILE_REQUEST,
+    INTERNAL_ERROR, CLOSED_CONNECTION};
+
+/* state of line read */
+enum LineStatus {
+    LINE_OK = 0,    /* complete request line */
+    LINE_BAD,       /* incomplete request line */
+    LINE_OPEN       /* line is reading */
+};
+
+enum Version {UNKNOW, HTTP10, HTTP11};
 
 #endif //PROJECT_COMMONUTIL_H

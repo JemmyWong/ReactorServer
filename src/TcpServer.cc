@@ -7,11 +7,11 @@
 
 using namespace std::placeholders;
 
-TcpServer::TcpServer(EventLoop *loop, const std::string name)
+TcpServer::TcpServer(EventLoop *loop, const std::string name, const std::string port)
         : loop_(loop),
-          ipPort_("9000"),
+          ipPort_(port),
           name_(name),
-          acceptor_(new Acceptor(loop_, "9000")),
+          acceptor_(new Acceptor(loop_, port)),
           threadPool_(new EventLoopThreadPool(loop_, name)),
           mutex(),
           started_(false),
@@ -44,8 +44,8 @@ void TcpServer::start() {
     threadPool_->start(threadInitCB_);
 }
 
-void TcpServer::newConnection(int sockFd, const void *addr) {
-//    struct sockaddr_in *peerAddr = reinterpret_cast<struct sockaddr_in *>(addr);
+void TcpServer::newConnection(int sockFd, void *addr) {
+    struct sockaddr_in *peerAddr = reinterpret_cast<struct sockaddr_in *>(addr);
 
     assert(loop_->isInLoopThread());
     EventLoop *ioLoop = threadPool_->getNextLoop();
