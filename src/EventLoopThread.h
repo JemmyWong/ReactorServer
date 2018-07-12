@@ -13,7 +13,7 @@ class EventLoopThread {
 public:
     typedef std::function<void(EventLoop *)> ThreadInitCB;
 
-    explicit EventLoopThread(const ThreadInitCB &cb = ThreadInitCB(), std::string = std::string());
+    explicit EventLoopThread(const ThreadInitCB &cb = ThreadInitCB(), const std::string &name = std::string());
     ~EventLoopThread();
     EventLoop *startLoop();
 

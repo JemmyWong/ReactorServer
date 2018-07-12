@@ -12,6 +12,9 @@
 #include <sys/mman.h>   /* mmap, munmap */
 #include <sys/stat.h>
 #include <sys/uio.h>    /* struct iovec */
+#include <sys/types.h>
+#include <sys/socket.h>
+
 
 static const int READ_BUFFER_SIZE = 1024;
 static const int WRITE_BUFFER_SIZE = 4096;
@@ -49,10 +52,11 @@ public:
     void connectionDestroyed();
     void connectionEstablished();
 
-    void send();
+    void send(const char *buf, int len);
     void stopRead();
     void startRead();
-    void sendInLoop();
+    void sendInLoop(const char *buf, int len);
+
 private:
     enum State {CConnecting, CConnected, CDisconnecting, CDisconnected};
 
@@ -63,7 +67,7 @@ private:
 
     void stopReadInLoop();
     void startReadInLoop();
-    void setState(State &s) { state_ = s; }
+    void setState(const State &s) { state_ = s; }
 
     EventLoop                   *loop_;
     int                         sockFd_;
@@ -74,8 +78,12 @@ private:
     int                         readIdx_;
     int                         writeIdx_;
     void                        *context_;
+    struct stat                 fileState_;
+    struct iovec                iv_[2];
     char                        readBuf_[READ_BUFFER_SIZE];
     char                        writeBuf_[WRITE_BUFFER_SIZE];
+
+    const int                   ivCount_ = 2;
 
     CloseCB         closeCB_;
     MessageCB       messageCB_;

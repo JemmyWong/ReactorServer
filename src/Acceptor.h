@@ -20,7 +20,7 @@
 
 class Acceptor {
 public:
-    typedef std::function<void(int fd, const struct sockaddr_in *peerAddr)> NewConnectionCB;
+    typedef std::function<void(int fd, const void *peerAddr)> NewConnectionCB;
 
     Acceptor(EventLoop *, const std::string &);
     ~Acceptor();

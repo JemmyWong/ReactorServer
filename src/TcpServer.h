@@ -39,7 +39,7 @@ public:
 private:
     typedef std::map<std::string, TcpConnectionPtr> ConnectionMap;
 
-    void newConnection(int sockFd, void *peerAddr);
+    void newConnection(int sockFd, const void *peerAddr);
     void removeConnection(const TcpConnectionPtr &conn);
     void removeConnectionInLoop(const TcpConnectionPtr &conn);
 

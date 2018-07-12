@@ -27,7 +27,7 @@ TcpServer::~TcpServer() {
         TcpConnectionPtr conn(it->second);
         it->second.reset();
         conn->getLoop()->runInLoop(
-                std::bind(&TcpConnection::connectionDestroyed, this, conn));
+                std::bind(&TcpConnection::connectionDestroyed, conn));
     }
 }
 
@@ -44,8 +44,8 @@ void TcpServer::start() {
     threadPool_->start(threadInitCB_);
 }
 
-void TcpServer::newConnection(int sockFd, void *addr) {
-    struct sockaddr_in *peerAddr = static_cast<struct sockaddr_in *>(addr);
+void TcpServer::newConnection(int sockFd, const void *addr) {
+//    struct sockaddr_in *peerAddr = reinterpret_cast<struct sockaddr_in *>(addr);
 
     assert(loop_->isInLoopThread());
     EventLoop *ioLoop = threadPool_->getNextLoop();
@@ -73,5 +73,5 @@ void TcpServer::removeConnectionInLoop(const TcpConnectionPtr &conn) {
         MutexLockGuard lock(mutex);
         assert(connections_.erase(conn->getName()) == 1);
     }
-    conn->getLoop()->queueInLoop(std::bind(&TcpConnection::connectionDestroyed, this));
+    conn->getLoop()->queueInLoop(std::bind(&TcpConnection::connectionDestroyed, conn));
 }

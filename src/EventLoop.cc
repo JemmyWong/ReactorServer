@@ -51,7 +51,7 @@ void EventLoop::loop() {
             currentActiveChannel = *it;
             currentActiveChannel->handleEvent();
         }
-        currentActiveChannel = NULL;
+        currentActiveChannel = nullptr;
         eventHandling_ = false;
 
         doPendingFunctors();

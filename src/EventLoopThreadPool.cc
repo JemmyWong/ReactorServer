@@ -33,7 +33,7 @@ void EventLoopThreadPool::start(const EventLoopThreadPool::ThreadInitCB &cb) {
     for (int i = 0; i < numThreads_; ++i) {
         char buf[name_.size() + 32];
         snprintf(buf, sizeof(buf), "%s-%d", name_, i);
-        EventLoopThreadPtr t = std::make_shared<EventLoopThread>(cb, buf);
+        EventLoopThreadPtr t = std::make_shared<EventLoopThread>(cb, std::string(buf));
         threads_.push_back(t);
         loops_.push_back(t->startLoop());
     }

@@ -5,7 +5,7 @@
 
 #include "EventLoopThread.h"
 
-EventLoopThread::EventLoopThread(const EventLoopThread::ThreadInitCB &cb, const std::string name = std::string())
+EventLoopThread::EventLoopThread(const ThreadInitCB &cb, const std::string &name)
         : loop_(nullptr),
           thread_(std::bind(&EventLoopThread::threadFunc, this), name),
           mutex_(),
@@ -38,7 +38,7 @@ void EventLoopThread::threadFunc() {
 }
 
 EventLoop *EventLoopThread::startLoop() {
-    assert(thread_.isStart());
+    assert(!thread_.isStart());
     thread_.start();
     {
         /* wait for thread routing to create loop_ */

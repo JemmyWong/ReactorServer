@@ -277,16 +277,17 @@ bool HttpConn::write() {
         }
         bytes_to_send -= tmp;
         bytes_have_send += tmp;
+        /* data send complete */
         if (bytes_to_send <= bytes_have_send) {
             unmap();
             if (linger) {
                 init();
                 modFd(epollFd, sockFd, EPOLLIN);
                 return true;
+            } else {
+                modFd(epollFd, sockFd, EPOLLIN);
+                return false;
             }
-        } else {
-            modFd(epollFd, sockFd, EPOLLIN);
-            return false;
         }
     }
 }

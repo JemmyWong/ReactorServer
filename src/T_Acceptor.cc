@@ -18,7 +18,7 @@
 #include <arpa/inet.h>
 #include <string>
 
-using namespace std;
+/*using namespace std;
 
 EventLoop *gLoop = nullptr;
 
@@ -35,6 +35,6 @@ int main() {
 
     loop.loop();
 
-}
+}*/
 
 

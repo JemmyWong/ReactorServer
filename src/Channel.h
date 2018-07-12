@@ -20,7 +20,7 @@ public:
 
     /* Tie this channel to the owner object managed by shared_ptr,
      * prevent the owner object being destroyed in handleEvent. */
-    void tie(std::shared_ptr<void> &);
+    void tie(const std::shared_ptr<void> &);
     EventLoop *ownerLoop() { return loop_; }
 
     void handleEvent();
