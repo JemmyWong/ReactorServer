@@ -5,6 +5,14 @@
 
 #include "HttpContext.h"
 
+HttpContext::HttpContext()
+        : checkedIdx_(0),
+          startLine_(0),
+          httpCode_(NO_REQUEST),
+          checkState_(CHECK_STATE_REQUESTLINE),
+          request_()
+{ }
+
 char *HttpContext::getLine() {
     return buf_ + startLine_;
 }
@@ -34,7 +42,7 @@ LineStatus HttpContext::parseLine() {
     return LINE_OPEN; /* line is reading */
 }
 
-bool HttpContext::parseRequest(const char *buf, int len) {
+HttpCode HttpContext::parseRequest(const char *buf, int len) {
     LineStatus  state = LINE_OK;
     HttpCode    code = NO_REQUEST;
     char *text = 0;
@@ -45,17 +53,93 @@ bool HttpContext::parseRequest(const char *buf, int len) {
 
         switch (checkState_) {
             case CHECK_STATE_REQUESTLINE:
-                code = request_.parseRequestLine(text, checkedIdx_);
+                code = parseRequestLine(text, (int)strlen(text));
+                if (code == BAD_REQUEST) {
+                    request_.setRequestCode(BAD_REQUEST);
+                    return BAD_REQUEST;
+                }
                 break;
             case CHECK_STATE_HEADER:
-                request_.parseHeader(text, checkedIdx_);
+                code = parseHeader(text, (int)strlen(text));
+                if (code == BAD_REQUEST) {
+                    request_.setRequestCode(BAD_REQUEST);
+                    return BAD_REQUEST;
+                } else if (code == GET_REQUEST) {
+                    request_.setRequestCode(GET_REQUEST);
+                    return GET_REQUEST;
+                }
                 break;
             case CHECK_STATE_CONTENT:
-                request_.parseBody(text, checkedIdx_);
+                code = parseBody(text, (int)strlen(text));
+                if (code == BAD_REQUEST) {
+                    request_.setRequestCode(BAD_REQUEST);
+                    return BAD_REQUEST;
+                } else if (code == GET_REQUEST) {
+                    request_.setRequestCode(GET_REQUEST);
+                    return GET_REQUEST;
+                }
                 break;
             default:
-                return false;
+                request_.setRequestCode(INTERNAL_ERROR);
+                return INTERNAL_ERROR;
         }
     }
-    return true;
+    request_.setRequestCode(NO_RESOURCE);
+    return NO_REQUEST;
+}
+
+HttpCode HttpContext::parseRequestLine(char *text, int len) {
+    const char *begin = text;
+    const char *end = text + len;
+    const char *space = std::find(begin, end, ' ');
+    if (space != end && request_.setMethod(begin, space)) {
+        begin = space + 1;
+        space = std::find(space, end, ' ');
+        if (space != end) {
+            const char *question = std::find(begin, space, '?');
+            if (question != end) {
+                request_.setPath(begin, question);
+                request_.setQuery(question, space);
+            } else {
+                request_.setPath(begin, space);
+            }
+        } else {
+            return BAD_REQUEST;
+        }
+        begin = space + 1;
+        bool ok = end - begin == 8 && std::equal(begin, end - 1, "HTTP/1.");
+        if (ok) {
+                request_.setVersion(begin, end);
+        } else {
+            return BAD_REQUEST;
+        }
+    } else {
+        return BAD_REQUEST;
+    }
+
+    return GET_REQUEST;
+}
+
+HttpCode HttpContext::parseHeader(char *text, int len) {
+    const char *begin = text;
+    const char *end = text + len;
+    const char *colon = std::find(begin, end, ':');
+    if (request_.addHeader(begin, colon, end))
+        return GET_REQUEST;
+    return BAD_REQUEST;
+}
+
+/* TODO parseBody */
+HttpCode HttpContext::parseBody(char *text, int len) {
+    return GET_REQUEST;
+}
+
+void HttpContext::reset() {
+    buf_ = nullptr;
+    readIdx_ = 0;
+    checkedIdx_ = 0;
+    startLine_ = 0;
+    httpCode_ = NO_REQUEST;
+    checkState_ = CHECK_STATE_REQUESTLINE;
+    request_.reset();
 }

@@ -26,6 +26,8 @@ TcpConnection::~TcpConnection() {
 }
 
 /* the server actively sends data */
+/* try to send data, if can not send whole data, save remaind data to conn's writeBuf_,
+ * enable EPOLLOUT, send it next time */
 void TcpConnection::send(const char *buf, int len) {
     if (state_ == CConnected) {
         if (loop_->isInLoopThread()) {

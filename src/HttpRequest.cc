@@ -7,14 +7,22 @@
 
 HttpRequest::HttpRequest() : method_(GET_REQUEST), version_(HTTP10){ };
 
-HttpCode HttpRequest::parseRequestLine(char *text, int len) {
+bool HttpRequest::addHeader(const char *begin, const char *colon, const char *end) {
+    std::string key(begin, colon);
+    ++colon;
+    while (begin < end && isspace(*colon)) ++ colon;
 
+    std::string value(colon, end);
+    while (!value.empty() && isspace(value[value.size()-1]))
+        value.reserve(value.size()-1);
+    headers_[key] = value;
+    return true;
 }
 
-HttpCode HttpRequest::parseHeader(char *text, int len) {
-
-}
-
-HttpCode HttpRequest::parseBody(char *text, int len) {
-
+void HttpRequest::reset() {
+    method_.clear();
+    path_.clear();
+    query_.clear();
+    version_.clear();
+    headers_.clear();
 }

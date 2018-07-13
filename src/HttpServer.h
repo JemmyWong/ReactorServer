@@ -25,7 +25,11 @@ public:
     void setHttpCB(const HttpCB &cb) { httpCB_ = cb; }
 
     void start();
+
 private:
+    void processError(const HttpRequest &req, HttpResponse *response);
+    void defaultHttpCB(const HttpRequest &req, HttpResponse *response);
+
     TcpServer   server_;
     HttpCB      httpCB_; /* user function to process client request */
 };

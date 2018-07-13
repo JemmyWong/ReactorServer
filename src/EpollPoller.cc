@@ -17,7 +17,8 @@ EpollPoller::~EpollPoller() {
 }
 
 void EpollPoller::poll(int ms, std::vector<Channel *> *activeChannels) {
-    int num = epoll_wait(epollFd_, &*eventVec_.begin(),
+    int num = epoll_wait(epollFd_,
+            eventVec_.data(),/*&*eventVec_.begin()*/
             static_cast<int>(eventVec_.size()), ms);
     printf("...epoll_wait size: %d\n", num);
     if (num > 0) {
