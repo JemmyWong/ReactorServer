@@ -44,8 +44,8 @@ void TcpServer::start() {
     threadPool_->start(threadInitCB_);
 }
 
-void TcpServer::newConnection(int sockFd, void *addr) {
-    struct sockaddr_in *peerAddr = reinterpret_cast<struct sockaddr_in *>(addr);
+void TcpServer::newConnection(int sockFd, const void *addr) {
+    struct sockaddr_in *peerAddr = reinterpret_cast<struct sockaddr_in *>(const_cast<void *>(addr));
 
     assert(loop_->isInLoopThread());
     EventLoop *ioLoop = threadPool_->getNextLoop();
@@ -54,20 +54,24 @@ void TcpServer::newConnection(int sockFd, void *addr) {
     std::string connName = name_ + buf;
 
     TcpConnectionPtr conn(new TcpConnection(ioLoop, connName, sockFd));
+    connections_[connName] = conn;
     conn->setMessageCb(messageCB_);
     conn->setConnectionCB(connectionCB_);
     conn->setWriteCompleteCB(writeCompleteCB_);
     /* thread safe guard by mutex */
     conn->setCloseCB(std::bind(&TcpServer::removeConnection, this, _1));
 
+    printf("%s->%s\n", __FILE__, __func__);
     ioLoop->runInLoop(std::bind(&TcpConnection::connectionEstablished, conn));
 }
 
 void TcpServer::removeConnection(const TcpConnectionPtr &conn) {
+    printf("%s->%s\n", __FILE__, __func__);
     loop_->runInLoop(std::bind(&TcpServer::removeConnectionInLoop, this, conn));
 }
 
 void TcpServer::removeConnectionInLoop(const TcpConnectionPtr &conn) {
+    printf("%s->%s\n", __FILE__, __func__);
     assert(loop_->isInLoopThread());
     {
         MutexLockGuard lock(mutex);

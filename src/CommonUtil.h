@@ -1,9 +1,10 @@
 //
 // Created by Jemmy on 2018/6/10.
 //
+#pragma once
 
-#ifndef PROJECT_COMMONUTIL_H
-#define PROJECT_COMMONUTIL_H
+/*#ifndef PROJECT_COMMONUTIL_H
+#define PROJECT_COMMONUTIL_H*/
 
 #include <iostream>
 #include <cerrno>
@@ -51,15 +52,20 @@ typedef std::function<void(const HttpRequest &, HttpResponse *)> HttpCB;
 
 
 /**************************************** Http Server **************************************************/
-const char *ok_200_title = "OK";
-const char *error_400_title = "Bad Request";
-const char *error_400_form = "Your request has bad syntax or is inherently impossible to satisfy.\n";
-const char *error_403_title = "Forbidden";
-const char *error_403_form = "You do not have permission to get file from this server.\n";
-const char *error_404_title = "Not Found";
-const char *error_404_form = "The request file was not found on this server.\n";
-const char *error_500_title = "Internal Error";
-const char *error_500_form = "There was an unusual problem serving the request file.\n";
+
+class HTTP {
+public:
+    static const char *ok_200_title;
+    static const char *ok_200_form;
+    static const char *error_400_title;
+    static const char *error_400_form;
+    static const char *error_403_title;
+    static const char *error_403_form;
+    static const char *error_404_title;
+    static const char *error_404_form;
+    static const char *error_500_title;
+    static const char *error_500_form;
+};
 
 /* http request method, only support GET */
 enum Method {GET = 0, POST, HEAD, PUT, DELETE,
@@ -83,4 +89,4 @@ enum LineStatus {
 
 enum Version {UNKNOW, HTTP10, HTTP11};
 
-#endif //PROJECT_COMMONUTIL_H
+//#endif //PROJECT_COMMONUTIL_H

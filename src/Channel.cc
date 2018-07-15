@@ -52,6 +52,7 @@ void Channel::handleEvent() {
 }
 
 void Channel::handleEventWithGuard() {
+    printf("%s->%s\n", __FILE__, __func__);
     eventHandling_ = true;
     /*if ((rcvEvents_ & POLLHUP) && !(rcvEvents_ & POLLIN)) {
         if (logHup_) {
@@ -77,6 +78,7 @@ void Channel::handleEventWithGuard() {
 }
 
 void Channel::tie(const std::shared_ptr<void> &obj) {
+    printf("%s->%s\n", __FILE__, __func__);
     tie_ = obj;
     tied_ = true;
 }

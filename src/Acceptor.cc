@@ -9,6 +9,9 @@
 int createNonBlockingFd(const std::string addr) {
     int fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, IPPROTO_TCP);
     assert(fd > 0);
+    int opt = 1;
+    ::setsockopt(fd, SOL_SOCKET, SO_REUSEPORT | SO_REUSEADDR,
+                 &opt, static_cast<socklen_t>(sizeof(opt)));
 
     struct sockaddr_in local;
     local.sin_family = AF_INET;
@@ -46,7 +49,14 @@ void Acceptor::handleRead() {
     struct sockaddr_in peerAddr;
     socklen_t len = sizeof(peerAddr);
     int newFd = accept(sockFd_, reinterpret_cast<struct sockaddr *>(&peerAddr), &len);
+    printf("%s->%s\n", __FILE__, __func__);
     if (newFd > 0) {
+        setNonBlock(newFd);
+        int opt = 1;
+        ::setsockopt(newFd, SOL_SOCKET, SO_REUSEPORT | SO_REUSEADDR,
+                     &opt, static_cast<socklen_t>(sizeof(opt)));
+//        ::setsockopt(newFd, IPPROTO_TCP, TCP_NODELAY,
+//                     &opt, static_cast<socklen_t>(sizeof(opt)));
         if (newConnectionCB_) {
             newConnectionCB_(newFd, &peerAddr);
         }

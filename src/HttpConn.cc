@@ -6,15 +6,15 @@
 #include "CommonUtil.h"
 
 
-const char *ok_200_title = "OK";
-const char *error_400_title = "Bad Request";
-const char *error_400_form = "Your request has bad syntax or is inherently impossible to satisfy.\n";
-const char *error_403_title = "Forbidden";
-const char *error_403_form = "You do not have permission to get file from this server.\n";
-const char *error_404_title = "Not Found";
-const char *error_404_form = "The request file was not found on this server.\n";
-const char *error_500_title = "Internal Error";
-const char *error_500_form = "There was an unusual problem serving the request file.\n";
+//const char *ok_200_title = "OK";
+//const char *error_400_title = "Bad Request";
+//const char *error_400_form = "Your request has bad syntax or is inherently impossible to satisfy.\n";
+//const char *error_403_title = "Forbidden";
+//const char *error_403_form = "You do not have permission to get file from this server.\n";
+//const char *error_404_title = "Not Found";
+//const char *error_404_form = "The request file was not found on this server.\n";
+//const char *error_500_title = "Internal Error";
+//const char *error_500_form = "There was an unusual problem serving the request file.\n";
 
 /* root path of web */
 const char *docRoot = "/work";
@@ -335,35 +335,35 @@ bool HttpConn::addContent(const char *content) {
 bool HttpConn::processWrite(HttpConn::HTTP_CODE code) {
     switch (code) {
         case INTERNAL_ERROR: {
-            addStatusLine(500, error_500_title);
-            addHeaders(strlen(error_500_form));
-            if (!addContent(error_500_form))
+            addStatusLine(500, HTTP::error_500_title);
+            addHeaders(strlen(HTTP::error_500_form));
+            if (!addContent(HTTP::error_500_form))
                 return false;
             break;
         }
         case BAD_REQUEST: {
-            addStatusLine(400, error_400_title);
-            addHeaders(strlen(error_400_form));
-            if (!addContent(error_400_form))
+            addStatusLine(400, HTTP::error_400_title);
+            addHeaders(strlen(HTTP::error_400_form));
+            if (!addContent(HTTP::error_400_form))
                 return false;
             break;
         }
         case NO_REQUEST: {
-            addStatusLine(404, error_404_title);
-            addHeaders(strlen(error_404_form));
-            if (!addContent(error_404_form))
+            addStatusLine(404, HTTP::error_404_title);
+            addHeaders(strlen(HTTP::error_404_form));
+            if (!addContent(HTTP::error_404_form))
                 return false;
             break;
         }
         case FORBIDDEN_REQUEST: {
-            addStatusLine(403, error_403_title);
-            addHeaders(strlen(error_403_form));
-            if (!addContent(error_403_form))
+            addStatusLine(403, HTTP::error_403_title);
+            addHeaders(strlen(HTTP::error_403_form));
+            if (!addContent(HTTP::error_403_form))
                 return false;
             break;
         }
         case FILE_REQUEST: {
-            addStatusLine(200, ok_200_title);
+            addStatusLine(200, HTTP::ok_200_title);
             if (fileStat.st_size != 0) {
                 addHeaders(fileStat.st_size);
                 iv[0].iov_base = writeBuf;

@@ -29,6 +29,7 @@ TcpConnection::~TcpConnection() {
 /* try to send data, if can not send whole data, save remaind data to conn's writeBuf_,
  * enable EPOLLOUT, send it next time */
 void TcpConnection::send(const char *buf, int len) {
+    printf("%s->%s\n", __FILE__, __func__);
     if (state_ == CConnected) {
         if (loop_->isInLoopThread()) {
             sendInLoop(buf, len);
@@ -39,29 +40,53 @@ void TcpConnection::send(const char *buf, int len) {
 }
 
 void TcpConnection::sendInLoop(const char *buf, int len) {
+    printf("%s->%s\n", __FILE__, __func__);
     assert(loop_->isInLoopThread());
     int n = 0;
     int bytes_have_send = 0;
     int bytes_to_send = len;
+    bool faultError = false;
 
-    while (true) {
-        n = ::send(channel_->getFd(), buf, len, 0);
-        if (n <= -1) {
+    /* 1. try to send data */
+    if (!channel_->isWriting()) {
+        n = write(channel_->getFd(), buf, len);
+        if (n < 0) {
             /* send failed, send again */
             if (errno == EAGAIN || errno == EWOULDBLOCK) {
                 channel_->enableWrite();
-                getLoop()->runInLoop(
-                        std::bind(&TcpConnection::sendInLoop,this, buf + bytes_have_send, len));
-                return;
             }
-            return;
+            if (errno == EPIPE || errno == ECONNRESET) {
+                faultError = true;
+            }
+        } else {
+            if (n == bytes_to_send && writeCompleteCB_) {
+                loop_->queueInLoop(std::bind(&TcpConnection::writeCompleteCB_, shared_from_this()));
+            }
         }
-        bytes_to_send -= n;
-        bytes_have_send += n;
-        /* data send have completed */
-        if (bytes_to_send <= bytes_have_send) {
-            return;
+    }
+
+    /* 2. save data and send it in the next time */
+    if (!faultError && n < len) {
+        strcpy(writeBuf_, buf + n);
+        writeIdx_ = len - n;
+        if (!channel_->isWriting()) {
+            channel_->enableWrite();
         }
+    }
+//    shutdownInLoop();
+}
+
+void TcpConnection::shutdown() {
+    if (state_ == CConnected) {
+        setState(CDisconnecting);
+        loop_->runInLoop(std::bind(&TcpConnection::shutdownInLoop, this));
+    }
+}
+
+void TcpConnection::shutdownInLoop() {
+    assert(loop_->isInLoopThread());
+    if (!channel_->isWriting()) {
+        ::shutdown(channel_->getFd(), SHUT_WR);
     }
 }
 
@@ -71,20 +96,27 @@ void TcpConnection::connectionEstablished() {
     setState(CConnected);
     channel_->tie(shared_from_this());
     channel_->enableRead();
-    connectionCB_(shared_from_this());
+    printf("%s->%s\n", __FILE__, __func__);
+    if (connectionCB_) {
+        connectionCB_(shared_from_this());
+    }
 }
 
 void TcpConnection::connectionDestroyed() {
+    printf("%s->%s\n", __FILE__, __func__);
     assert(loop_->isInLoopThread());
     if (state_ == CConnected) {
         setState(CDisconnected);
         channel_->disableAll();
-        connectionCB_(shared_from_this());
+        if (connectionCB_) {
+            connectionCB_(shared_from_this());
+        }
     }
     channel_->remove();
 }
 
 void TcpConnection::handleRead() {
+    printf("%s->%s\n", __FILE__, __func__);
     assert(loop_->isInLoopThread());
     int byteRead = 0;
 
@@ -107,10 +139,12 @@ void TcpConnection::handleRead() {
             return;
         }
     }
+    context_->setBuffer(readBuf_, readIdx_);
     messageCB_(shared_from_this(), readBuf_, readIdx_);
 }
 
 void TcpConnection::handleWrite() {
+    printf("%s->%s\n", __FILE__, __func__);
     assert(loop_->isInLoopThread());
     if (channel_->isWriting()) {
         int n = 0;
@@ -119,26 +153,37 @@ void TcpConnection::handleWrite() {
 
         bool ret = false;
         while (true) {
-            n = writev(channel_->getFd(), iv_, ivCount_);
-            if (n <= -1) {
+            n = write(channel_->getFd(), writeBuf_, writeIdx_);
+            if (n < 0) {
                 /* if there is no space in TCP buffer, wait for next EPOLLOUT event,
                  * even through server can't accept next request from the same fd immediately,
                  * but we can make sure complete connection */
                 if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                    channel_->enableWrite();
+                    if (!channel_->isWriting())
+                        channel_->enableWrite();
+                    continue;
+                } else {
+                    return;
                 }
-//                unmap();
+            } else if (n > 0) {
+                bytes_to_send -= n;
+                bytes_have_send += n;
+                /* data send completed */
+                if (bytes_to_send <= bytes_have_send) {
+                    channel_->disableWrite();
+                    if (writeCompleteCB_){
+                        loop_->queueInLoop(std::bind(&TcpConnection::writeCompleteCB_, shared_from_this()));
+                    }
+                    if (state_ == CDisconnecting) {
+                        shutdownInLoop();
+                    }
+                    break;
+                }
+            } else {
+                handleClose();
                 return;
             }
-            bytes_to_send -= n;
-            bytes_have_send += n;
-            /* data send completed */
-            if (bytes_to_send <= bytes_have_send) {
-//                unmap();
-                break;
-            }
         }
-        writeCompleteCB_(shared_from_this());
     }
 }
 

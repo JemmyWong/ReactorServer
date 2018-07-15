@@ -6,10 +6,16 @@
 #ifndef PROJECT_HTTPSERVER_H
 #define PROJECT_HTTPSERVER_H
 
+#include <fstream>
+#include <sstream>
+#include <iostream>
+
 #include "CommonUtil.h"
 #include "TcpServer.h"
 #include "HttpRequest.h"
 #include "HttpResponse.h"
+
+using namespace std::placeholders;
 
 class HttpServer {
 public:
@@ -17,12 +23,15 @@ public:
     ~HttpServer();
 
     void onConnection(const TcpConnectionPtr &conn);
-    void onMessage(const TcpConnectionPtr &conn, char *buf, int len);
+    void onMessage(const TcpConnectionPtr &conn, const char *buf, int len);
     void onRequest(const TcpConnectionPtr &conn, const HttpRequest &);
 
     EventLoop *getLoop() { return server_.getLoop(); }
 
     void setHttpCB(const HttpCB &cb) { httpCB_ = cb; }
+    void setThreadNum(int num) {
+        server_.setThreadNum(num);
+    }
 
     void start();
 

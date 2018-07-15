@@ -5,14 +5,21 @@
 
 #include "HttpRequest.h"
 
-HttpRequest::HttpRequest() : method_(GET_REQUEST), version_(HTTP10){ };
+HttpRequest::HttpRequest()
+        : requestCode_(NO_REQUEST),
+          method_(),
+          path_(),
+          query_(),
+          version_(),
+          headers_()
+{ }
 
 bool HttpRequest::addHeader(const char *begin, const char *colon, const char *end) {
-    std::string key(begin, colon);
+    std::string key(begin, (size_t)(colon - begin));
     ++colon;
     while (begin < end && isspace(*colon)) ++ colon;
 
-    std::string value(colon, end);
+    std::string value(colon, (size_t )(end - colon));
     while (!value.empty() && isspace(value[value.size()-1]))
         value.reserve(value.size()-1);
     headers_[key] = value;

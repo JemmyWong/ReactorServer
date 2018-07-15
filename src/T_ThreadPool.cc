@@ -18,6 +18,7 @@ void func_() {
     printf("$$$$$$$$$$$$$    @@@@@@@@@\n");
 }
 
+/*
 int main() {
     EventLoop loop;
     EventLoopThreadPool pool(&loop, "pool");
@@ -35,4 +36,4 @@ int main() {
     }
 
     loop.loop();
-}
+}*/

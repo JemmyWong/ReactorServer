@@ -6,10 +6,11 @@
 #ifndef PROJECT_HTTPCONTEXT_H
 #define PROJECT_HTTPCONTEXT_H
 
-#include "HttpRequest.h"
 #include <algorithm>
 #include <string>
-#include <string.h>
+#include <cstring>
+
+#include "HttpRequest.h"
 
 class HttpContext {
 public:
@@ -22,6 +23,10 @@ public:
     HttpCode parseBody(char *text, int len);
     HttpCode parseHeader(char *text, int len);
     HttpCode parseRequestLine(char *text, int len);
+    void setBuffer(char *buf, int s) {
+        buf_ = buf;
+        readIdx_ = s;
+    }
 
     const HttpRequest getRequest() const { return request_; }
 private:

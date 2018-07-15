@@ -7,7 +7,6 @@
 #define PROJECT_HTTPRESPONSE_H
 
 #include "CommonUtil.h"
-
 #include "HttpContext.h"
 
 class HttpResponse {
@@ -27,6 +26,12 @@ public:
     bool isCloseConnection() { return closeConnection_; }
 
     const std::string toStting();
+    void setBody(const std::string &&str) {
+        body_.assign(str);
+    }
+    std::string &getBody() {
+        return body_;
+    }
 
 private:
     std::string     version_;

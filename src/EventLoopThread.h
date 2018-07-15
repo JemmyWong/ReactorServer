@@ -6,6 +6,9 @@
 #ifndef PROJECT_EVENTLOOPTHREAD_H
 #define PROJECT_EVENTLOOPTHREAD_H
 
+#include <string>
+#include <functional>
+
 #include "Thread.h"
 #include "EventLoop.h"
 

@@ -6,6 +6,7 @@
 #ifndef PROJECT_CHANNEL_H
 #define PROJECT_CHANNEL_H
 
+#include <memory>
 #include "EventLoop.h"
 
 class EventLoop;

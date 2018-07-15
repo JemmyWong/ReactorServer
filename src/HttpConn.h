@@ -21,6 +21,8 @@
 #include <cstdarg>      /* va_list */
 #include <fcntl.h>
 
+#include "CommonUtil.h"
+
 class HttpConn {
 public:
     static const int FILENAME_LEN = 200;
@@ -92,7 +94,7 @@ public:
     static int userCount;
 private:
     int         sockFd;
-    sockaddr_in address;
+    struct sockaddr_in address;
 
     char        readBuf[READ_BUFFER_SIZE];
     int         readIdx;    /* position of the char has read in the buf*/

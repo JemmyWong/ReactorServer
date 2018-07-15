@@ -16,9 +16,8 @@
 #include <sys/socket.h>
 #include "HttpContext.h"
 
-
-static const int READ_BUFFER_SIZE = 1024;
-static const int WRITE_BUFFER_SIZE = 4096;
+static const int READ_BUFFER_SIZE = 10240;
+static const int WRITE_BUFFER_SIZE = 40960;
 
 class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
 public:
@@ -37,7 +36,7 @@ public:
     void setWriteCompleteCB(const WriteCompleteCB &cb) {
         writeCompleteCB_ = cb;
     }
-    void setContext(std::shared_ptr<void> &context) {
+    void setContext(std::shared_ptr<HttpContext> &context) {
         context_ = context;
     }
 
@@ -50,6 +49,8 @@ public:
         return context_;
     }
 
+    bool isConnected() { return state_ == CConnected; }
+
     void connectionDestroyed();
     void connectionEstablished();
 
@@ -58,12 +59,14 @@ public:
     void startRead();
     void sendInLoop(const char *buf, int len);
 
+    void shutdown();
+    void shutdownInLoop();
 private:
     enum State {CConnecting, CConnected, CDisconnecting, CDisconnected};
 
     void handleRead();
     void handleWrite();
-    void handleClose();
+    void handleClose(); /* realy closed by client */
     void handleError();
 
     void stopReadInLoop();

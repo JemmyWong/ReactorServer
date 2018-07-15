@@ -18,21 +18,20 @@ class HttpResponse;
 class HttpRequest {
 public:
     HttpRequest();
-
     bool setMethod(const char *begin, const char *end) {
-        method_ = std::string(begin, end);
+        method_.assign(begin, (size_t)(end - begin));
         return !method_.empty();
     }
     bool setPath(const char *begin, const char *end) {
-        path_ = std::string(begin, end);
+        path_ .assign(begin, (size_t)(end - begin));
         return !path_.empty();
     }
     bool setVersion(const char *begin, const char *end) {
-        version_ = std::string(begin, end);
-        return version_.empty();
+        version_.assign(begin, (size_t)(end - begin));
+        return !version_.empty();
     }
     bool setQuery(const char *begin , const char *end) {
-        query_ = std::string(begin, end);
+        query_.assign(begin, (size_t)(end - begin));
         return !query_.empty();
     }
     bool setRequestCode (HttpCode code) {
@@ -43,13 +42,18 @@ public:
 
     void reset();
 
-    HttpCode getRequestCode()   const { return requestCode_; };
-    std::string &getPath()      const { return path_; }
-    std::string &getQuery()     const { return query_; }
-    std::string &getMethod()    const { return method_; }
-    std::string &getVersion()   const { return version_; }
+    const HttpCode getRequestCode() const { return requestCode_; };
+    const std::string &getPath()    const { return path_; }
+    const std::string &getQuery()   const { return query_; }
+    const std::string &getMethod()  const { return method_; }
+    const std::string &getVersion() const { return version_; }
     const std::map<std::string, std::string> &getHeaders() const { return headers_; };
-    const std::string &getHeader(const std::string &key) const { return headers_[key]; }
+    std::string getHeader(const std::string &key) const {
+        auto it = headers_.find(key);
+        if (it != headers_.end());
+            return it->second;
+        return std::string();
+    }
 
 private:
     HttpCode            requestCode_;

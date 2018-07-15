@@ -56,3 +56,14 @@ void modFd(int epollFd, int fd, int ev) {
     ee.events = ev | EPOLLET | EPOLLONESHOT | EPOLLRDHUP;
     epoll_ctl(epollFd, EPOLL_CTL_MOD, fd, &ee);
 }
+
+const char *HTTP::ok_200_title = "OK";
+const char *HTTP::ok_200_form = "OK";
+const char *HTTP::error_400_title = "Bad Request";
+const char *HTTP::error_400_form = "Your request has bad syntax or is inherently impossible to satisfy.\n";
+const char *HTTP::error_403_title = "Forbidden";
+const char *HTTP::error_403_form = "You do not have permission to get file from this server.\n";
+const char *HTTP::error_404_title = "Not Found";
+const char *HTTP::error_404_form = "The request file was not found on this server.\n";
+const char *HTTP::error_500_title = "Internal Error";
+const char *HTTP::error_500_form = "There was an unusual problem serving the request file.\n";

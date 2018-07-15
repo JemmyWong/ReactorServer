@@ -17,6 +17,7 @@ EpollPoller::~EpollPoller() {
 }
 
 void EpollPoller::poll(int ms, std::vector<Channel *> *activeChannels) {
+    printf("%s->%s, eventVec size: %d\n", __FILE__, __func__, static_cast<int>(eventVec_.size()));
     int num = epoll_wait(epollFd_,
             eventVec_.data(),/*&*eventVec_.begin()*/
             static_cast<int>(eventVec_.size()), ms);
@@ -97,7 +98,7 @@ void EpollPoller::update(int op, Channel *channel) {
     printf("...updata(), fd[%d] op: %d\n", channel->getFd(), op);
     struct epoll_event ev;
     memset(&ev, 0, sizeof(ev));
-    ev.events = channel->getEvents();
+    ev.events = EPOLLET | channel->getEvents();
     ev.data.ptr = channel;
     int fd = channel->getFd();
     if (epoll_ctl(epollFd_, op, fd, &ev) < 0) {
