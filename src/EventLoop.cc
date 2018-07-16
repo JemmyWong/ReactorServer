@@ -44,7 +44,6 @@ void EventLoop::loop() {
     while (!quit_) {
         activeChannels_.clear();
         poller_->poll(CPollTimeMs, &activeChannels_);
-        printf("... poll back, active channel size: %d\n", activeChannels_.size());
         eventHandling_ = true;
         for (std::vector<Channel *>::iterator it = activeChannels_.begin();
                 it != activeChannels_.end(); ++it) {

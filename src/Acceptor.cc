@@ -36,7 +36,6 @@ Acceptor::Acceptor(EventLoop *loop, const std::string &addr)
           acceptChannel_(loop_, sockFd_),
           listening_(true)
 {
-    printf("...Acceptor()\n");
     /* EPOLLIN means a new sock connection event */
     acceptChannel_.setReadCB(std::bind(&Acceptor::handleRead, this));
     acceptChannel_.enableRead();

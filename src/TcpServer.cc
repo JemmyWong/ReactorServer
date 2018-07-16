@@ -61,7 +61,7 @@ void TcpServer::newConnection(int sockFd, const void *addr) {
     /* thread safe guard by mutex */
     conn->setCloseCB(std::bind(&TcpServer::removeConnection, this, _1));
 
-    printf("%s->%s\n", __FILE__, __func__);
+    printf("%s->%s, next loop: %d\n", __FILE__, __func__, ioLoop);
     ioLoop->runInLoop(std::bind(&TcpConnection::connectionEstablished, conn));
 }
 
