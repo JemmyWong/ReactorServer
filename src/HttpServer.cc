@@ -51,7 +51,7 @@ void HttpServer::onRequest(const TcpConnectionPtr &conn, const HttpRequest &req)
     data.append(response.getBody());
     conn->send(data.c_str(), (int)data.size());
 //    if (response.isCloseConnection()) {
-        conn->shutdown();
+//        conn->shutdown();
 //    }
 }
 
@@ -62,7 +62,8 @@ void HttpServer::defaultHttpCB(const HttpRequest &req, HttpResponse *response) {
         processError(req, response);
     } else {
         response->setVersion(req.getVersion());
-        response->addHeaders(req.getHeaders());
+        response->addHeader("Server", "47.96.106.37:9000");
+        response->addHeader("Content-Type", "text/html charset=utf-8");
 
         struct stat fileStat;
         std::string filePath = "/root" + req.getPath();
@@ -70,18 +71,21 @@ void HttpServer::defaultHttpCB(const HttpRequest &req, HttpResponse *response) {
             response->setResponseCode("400");
             response->setResposneMsg(HTTP::error_400_title);
             response->setBody(HTTP::error_400_form);
+            response->addHeader("Content-Length", response->getBodySize() + "");
             return;
         }
         if (!(fileStat.st_mode & S_IROTH)){
             response->setResponseCode("403");
             response->setResposneMsg(HTTP::error_403_title);
             response->setBody(HTTP::error_403_form);
+            response->addHeader("Content-Length", response->getBodySize() + "");
             return;
         }
         if (S_ISDIR(fileStat.st_mode)) {
             response->setResponseCode("400");
             response->setResposneMsg(HTTP::error_400_title);
             response->setBody(HTTP::error_400_form);
+            response->addHeader("Content-Length", response->getBodySize() + "");
             return;
         }
 
@@ -92,9 +96,11 @@ void HttpServer::defaultHttpCB(const HttpRequest &req, HttpResponse *response) {
         std::ifstream file(filePath);
         std::stringstream buf;
         buf << file.rdbuf();
+//        buf << "\0";    // not work
         std::string content(buf.str());
         response->setResponseCode("200");
         response->setResposneMsg(HTTP::ok_200_title);
+
         response->setBody(std::move(content));
     }
 }
@@ -103,7 +109,8 @@ void HttpServer::processError(const HttpRequest &req, HttpResponse *response) {
     printf("%s->%s\n", __FILE__, __func__);
     HttpCode code = req.getRequestCode();
     response->setVersion(req.getVersion());
-    response->addHeaders(req.getHeaders());
+    response->addHeader("Server", "47.96.106.37:9000");
+    response->addHeader("Content-Type", "text/html charset=utf-8");
 
     switch (code) {
         case NO_REQUEST:
@@ -117,14 +124,14 @@ void HttpServer::processError(const HttpRequest &req, HttpResponse *response) {
             response->setBody(HTTP::error_404_form);
             break;
         case INTERNAL_ERROR:
-            response->setResponseCode("404");
-            response->setResposneMsg(HTTP::error_404_title);
-            response->setBody(HTTP::error_404_form);
+            response->setResponseCode("500");
+            response->setResposneMsg(HTTP::error_500_title);
+            response->setBody(HTTP::error_500_form);
             break;
         case NO_RESOURCE:
-            response->setResponseCode("404");
-            response->setResposneMsg(HTTP::error_404_title);
-            response->setBody(HTTP::error_404_form);
+            response->setResponseCode("403");
+            response->setResposneMsg(HTTP::error_403_title);
+            response->setBody(HTTP::error_403_form);
             break;
         default:
             response->setResponseCode("404");
@@ -132,6 +139,7 @@ void HttpServer::processError(const HttpRequest &req, HttpResponse *response) {
             response->setBody(HTTP::error_404_form);
             break;
     }
+    response->addHeader("Content-Length", response->getBodySize() + "");
 }
 
 void HttpServer::start() {

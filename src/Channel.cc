@@ -55,7 +55,7 @@ void Channel::handleEvent() {
 void Channel::handleEventWithGuard() {
     printf("%s->%s\n", __FILE__, __func__);
     eventHandling_ = true;
-    if ((rcvEvents_ & EPOLLHUP) && !(rcvEvents_ & EPOLLIN)) {
+    if ((rcvEvents_ & EPOLLHUP) /*&& !(rcvEvents_ & EPOLLIN)*/) {
         if (logHup_) {
             printf("fd = %d, Channel::handle_event() EPOLLHUP\n", fd_);
         }
@@ -69,7 +69,7 @@ void Channel::handleEventWithGuard() {
     if (rcvEvents_ & (EPOLLERR)) {
         if (errorCB_) errorCB_();
     }
-    if (rcvEvents_ & (EPOLLIN | EPOLLPRI | EPOLLRDHUP)) {
+    if (rcvEvents_ & (EPOLLIN | EPOLLPRI)) {
         if (readCB_) readCB_();
     }
     if (rcvEvents_ & EPOLLOUT) {

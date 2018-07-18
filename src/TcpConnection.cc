@@ -188,6 +188,7 @@ void TcpConnection::handleWrite() {
 }
 
 void TcpConnection::handleClose() {
+    printf("%s->%s\n", __FILE__, __func__);
     assert(loop_->isInLoopThread());
     assert(state_ == CConnected || state_ == CConnecting);
     // we don't close fd, leave it to dtor, so we can find leaks easily.

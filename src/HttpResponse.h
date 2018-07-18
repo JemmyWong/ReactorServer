@@ -32,6 +32,9 @@ public:
     std::string &getBody() {
         return body_;
     }
+    long long getBodySize() const {
+        return (long long)body_.size();
+    }
 
 private:
     std::string     version_;
