@@ -1,19 +1,18 @@
-/*
 #ifndef _TIMER_H_
 #define _TIMER_H_
 
 #include <iostream>
 #include <netinet/in.h>
-#include <time.h>
+#include <ctime>
 #include <cassert>
 #include <pthread.h>
 
 #include <algorithm>
-#include <utility>  */
-/* swap *//*
+#include <utility>
+/* swap */
 
 
-#include "slog.h"
+#include "Slog.h"
 #include "Mutex.h"
 
 using std::exception;
@@ -22,12 +21,11 @@ using std::exception;
 
 class Timer;
 
-void handle_timer_event(handle_event_msg_t *handle_event_msg);
+/*void handle_timer_event(handle_event_msg_t *handle_event_msg);
 
 event_handler_t *create_timer_handler(reactor_t *reactor);
 
-*/
-/* provided for handle_timer.cc *//*
+*//* provided for handle_timer.cc *//*
 
 void addTimer(int delay);
 
@@ -36,7 +34,7 @@ struct ClientData {
     Timer       *timer;
     sockaddr_in address;
     char buf[BUFFER_SIZE];
-};
+};*/
 
 class Timer {
 public:
@@ -80,16 +78,14 @@ private:
 
     void resize() throw (std::exception);
 private:
-    Timer   **array;    */
-/* time heap array *//*
-
+    Timer   **array;
+/* time heap array */
     int     capacity;
     int     cur_size;
-    */
-/* lock heap when add, del timer *//*
 
+/* lock heap when add, del timer */
 //    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
     MutexLock mutex;
 };
 
-#endif*/
+#endif

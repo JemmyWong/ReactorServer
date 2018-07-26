@@ -1,5 +1,4 @@
-/*
-#include "timer.h"
+#include "Timer.h"
 #include "Mutex.h"
 
 TimerHeap::TimerHeap(int cap) throw(std::exception): capacity(cap), cur_size(0) {
@@ -135,4 +134,4 @@ void TimerHeap::resize() throw (std::exception) {
     }
     delete [] array;
     array = tmp;
-}*/
+}

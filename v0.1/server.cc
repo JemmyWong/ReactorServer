@@ -2,8 +2,8 @@
 #include <arpa/inet.h>
 #include <sys/resource.h> /* rlimit */
 
-#include "slog.h"
-#include "timer.h"
+#include "Slog.h"
+#include "Timer.h"
 #include "server.h"
 #include "reactor.h"
 #include "HttpConn.h"

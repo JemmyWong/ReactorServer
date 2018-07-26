@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <sys/epoll.h>
 
-#include "slog.h"
+#include "Slog.h"
 #include "reactor.h"
 #include "CommonUtil.h"
 #include "header.h"
