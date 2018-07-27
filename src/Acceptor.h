@@ -16,6 +16,7 @@
 #include <functional>
 #include <cassert>
 
+#include "Slog.h"
 #include "Channel.h"
 #include "EventLoop.h"
 

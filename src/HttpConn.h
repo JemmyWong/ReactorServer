@@ -17,7 +17,7 @@
 #include <cstring>
 #include <cstdlib>      /* atol */
 #include <cerrno>
-#include <stdio.h>
+#include <cstdio>
 #include <cstdarg>      /* va_list */
 #include <fcntl.h>
 
@@ -50,8 +50,8 @@ public:
     };
 
 public:
-    HttpConn() {};
-    ~HttpConn() {};
+    HttpConn() = default;
+    ~HttpConn() = default;
 public:
     /* init a connection */
     void init(int sockFd, const sockaddr_in &addr);

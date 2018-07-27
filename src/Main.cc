@@ -3,10 +3,16 @@
  *
  */
 
-#include <EventLoop.h>
+#include "Slog.h"
+#include "EventLoop.h"
 #include "HttpServer.h"
 
 int main() {
+    int ret = slog_init();
+    if (ret) {
+        fprintf(stderr, "log_init error: %s\n", strerror(errno));
+        exit(0);
+    }
     EventLoop loop;
     std::string name = "holy";
     HttpServer server(&loop, name);

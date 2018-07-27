@@ -1,7 +1,7 @@
 #ifndef _LOG_H_
 #define _LOG_H_
 
-#include <stddef.h> /* size_t */
+#include <cstddef> /* size_t */
 
 #define LOG_BUFFER_MAX_LENGTH 1024
 #define LOG_FILE_DEBUG   "debug.log"

@@ -47,5 +47,6 @@ EventLoop *EventLoopThread::startLoop() {
             cond_.wait();
         }
     }
+
     return loop_;
 }

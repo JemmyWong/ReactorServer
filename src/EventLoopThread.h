@@ -9,6 +9,7 @@
 #include <string>
 #include <functional>
 
+#include "Slog.h"
 #include "Thread.h"
 #include "EventLoop.h"
 

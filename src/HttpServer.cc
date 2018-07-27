@@ -20,11 +20,12 @@ void HttpServer::onConnection(const TcpConnectionPtr &conn) {
     std::shared_ptr<HttpContext> context(new HttpContext);
     conn->setContext(context);
     printf("%s->%s\n", __FILE__, __func__);
-
+    slog_info("trace...");
 }
 
 void HttpServer::onMessage(const TcpConnectionPtr &conn, const char *buf, int len) {
     printf("%s -> %s\n", __FILE__, __func__);
+    slog_info("trace...");
     std::shared_ptr<HttpContext> context = conn->getMutableContext();
 //    if (context->parseRequest(buf, len) != GET_REQUEST) {
 //        const char *code = "HTTP/1.1 400 Bad Request\r\n\r\n";
@@ -41,6 +42,7 @@ void HttpServer::onMessage(const TcpConnectionPtr &conn, const char *buf, int le
 
 void HttpServer::onRequest(const TcpConnectionPtr &conn, const HttpRequest &req) {
     printf("%s->%s\n", __FILE__, __func__);
+    slog_info("trace...");
     std::string connection = req.getHeader("Connection");
     bool close = connection == "close"
                                ||(req.getVersion() == "HTTP/1.0" && connection != "Keep-Alive");
@@ -57,6 +59,7 @@ void HttpServer::onRequest(const TcpConnectionPtr &conn, const HttpRequest &req)
 
 void HttpServer::defaultHttpCB(const HttpRequest &req, HttpResponse *response) {
     printf("%s->%s\n", __FILE__, __func__);
+    slog_info("trace...");
     HttpCode requestCode = req.getRequestCode();
     if (requestCode != GET_REQUEST) {
         processError(req, response);
@@ -106,6 +109,7 @@ void HttpServer::defaultHttpCB(const HttpRequest &req, HttpResponse *response) {
 }
 
 void HttpServer::processError(const HttpRequest &req, HttpResponse *response) {
+    slog_info("trace...");
     printf("%s->%s\n", __FILE__, __func__);
     HttpCode code = req.getRequestCode();
     response->setVersion(req.getVersion());

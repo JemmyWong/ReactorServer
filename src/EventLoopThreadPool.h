@@ -6,6 +6,7 @@
 #ifndef PROJECT_EVENTLOOPTHREADPOOL_H
 #define PROJECT_EVENTLOOPTHREADPOOL_H
 
+#include "Slog.h"
 #include "EventLoop.h"
 #include "EventLoopThread.h"
 

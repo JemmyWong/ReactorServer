@@ -32,6 +32,7 @@ TcpServer::~TcpServer() {
 }
 
 void TcpServer::setThreadNum(int num) {
+    slog_info("setThread num = %d", num);
     assert(num >= 0);
     threadPool_->setNumThreads(num);
 }
@@ -40,7 +41,7 @@ void TcpServer::start() {
     assert(!started_);
     started_ = true;
     assert(loop_->isInLoopThread());
-
+    slog_info("TcpServer start...");
     threadPool_->start(threadInitCB_);
 }
 
@@ -52,6 +53,7 @@ void TcpServer::newConnection(int sockFd, const void *addr) {
     char buf[64];
     snprintf(buf, sizeof(buf), "-%s*%d", "9000", nextConnId_++);
     std::string connName = name_ + buf;
+    slog_info("new connction name = %s, next loop[%d]", connName, ioLoop);
 
     TcpConnectionPtr conn(new TcpConnection(ioLoop, connName, sockFd));
     connections_[connName] = conn;
@@ -67,6 +69,7 @@ void TcpServer::newConnection(int sockFd, const void *addr) {
 
 void TcpServer::removeConnection(const TcpConnectionPtr &conn) {
     printf("%s->%s\n", __FILE__, __func__);
+    slog_info("conn name = %s", conn->getName());
     loop_->runInLoop(std::bind(&TcpServer::removeConnectionInLoop, this, conn));
 }
 

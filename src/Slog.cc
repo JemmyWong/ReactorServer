@@ -1,8 +1,8 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <string.h>
-#include <errno.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cstdarg>
+#include <cstring>
+#include <cerrno>
 #include <pthread.h>
 
 #include <sys/types.h> /* getpid */
@@ -22,7 +22,7 @@ static void slog_clean_thread_key() {
 }
 
 int slog_init() {
-    printf("--------- slog init start -------------\n");
+    printf("- - - - - - - - - slog init start - - - - - - - - - - - - -\n");
 
     int ret = pthread_rwlock_wrlock(&lock_env);
     if (ret) {
@@ -44,7 +44,7 @@ int slog_init() {
         return -1;
     }
 
-    printf("----------- slog init end ----------\n");
+    printf("- - - - - - - - - - - slog init end - - - - - - - - - -\n");
 
     return 0;
 }

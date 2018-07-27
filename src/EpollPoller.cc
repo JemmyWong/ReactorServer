@@ -2,6 +2,7 @@
  * Created by Jemmy on 2018/7/8.
  *
  */
+#include "Slog.h"
 #include "EpollPoller.h"
 
 EpollPoller::EpollPoller(EventLoop *loop)
@@ -21,6 +22,7 @@ void EpollPoller::poll(int ms, std::vector<Channel *> *activeChannels) {
             eventVec_.data(),/*&*eventVec_.begin()*/
             static_cast<int>(eventVec_.size()), ms);
     if (num > 0) {
+        slog_info("[%d] ready resource", num);
         fillActiveChannel(num, activeChannels);
         if (static_cast<size_t >(num) == eventVec_.size()) {
             eventVec_.reserve(eventVec_.size() * 2);
@@ -29,6 +31,7 @@ void EpollPoller::poll(int ms, std::vector<Channel *> *activeChannels) {
 
     } else {
         printf("epoll_wait Error: %s\n", strerror(errno));
+        slog_error("epoll_wait Error: %s", strerror(errno));
     }
 }
 
@@ -73,6 +76,7 @@ void EpollPoller::updateChannel(Channel *channel) {
         }
     }
     printf("ChannelMap:<%d,%d>\n", fd, channels_[fd]);
+    slog_info("ChannelMap:<%d,%d>", fd, channels_[fd]);
 }
 
 void EpollPoller::removeChannel(Channel *channel) {

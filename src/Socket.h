@@ -14,7 +14,7 @@
 
 class Socket {
 public:
-    Socket(int fd);
+    explicit Socket(int fd);
     ~Socket();
 
     int getFd() { return sockFd_; }

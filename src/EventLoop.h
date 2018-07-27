@@ -28,7 +28,7 @@ public:
     typedef std::function<void()>       Functor;
 
     EventLoop();
-//    EventLoop(EventLoop &) = delete;
+    EventLoop(EventLoop &) = delete;
     ~EventLoop();
 
     void loop();

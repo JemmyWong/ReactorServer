@@ -4,6 +4,7 @@
  */
 
 #include "Thread.h"
+#include "Slog.h"
 
 struct ThreadData {
     typedef Thread::ThreadFunc ThreadFunc;
@@ -74,6 +75,7 @@ void Thread::start() {
         latch_.wait();
         assert(tid_ > 0);
         printf("%s tid = %d created success\n", name_.c_str(), tid_);
+        slog_info("%s tid = %d created success", name_.c_str(), tid_);
     }
 }
 

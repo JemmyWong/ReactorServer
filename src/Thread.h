@@ -21,7 +21,7 @@
 class Thread {
 public:
     typedef std::function<void()> ThreadFunc;
-    Thread(const ThreadFunc &, std::string name = std::string());
+    explicit Thread(const ThreadFunc &, std::string name = std::string());
     Thread(Thread &) = delete;
     ~Thread();
 

@@ -30,6 +30,7 @@ void EventLoopThreadPool::start(const EventLoopThreadPool::ThreadInitCB &cb) {
     assert(baseLoop_->isInLoopThread());
     started_ = true;
 
+    slog_info("EventLoopThreadPool start...");
     for (int i = 0; i < numThreads_; ++i) {
         char buf[name_.size() + 32];
         snprintf(buf, sizeof(buf), "%s-%d", name_, i);

@@ -11,7 +11,6 @@
 #include <utility>
 /* swap */
 
-
 #include "Slog.h"
 #include "Mutex.h"
 
@@ -38,7 +37,7 @@ struct ClientData {
 
 class Timer {
 public:
-    Timer(int delay) {
+    explicit Timer(int delay) {
         args = nullptr;
         cb_func = nullptr;
         expire = delay;
@@ -53,7 +52,7 @@ public:
 
 class TimerHeap {
 public:
-    TimerHeap(int cap) throw(std::exception);
+    explicit TimerHeap(int cap) throw(std::exception);
 //  initialized with an existing array
     TimerHeap(Timer **init_array, int size, int cap) throw(std::exception);
 

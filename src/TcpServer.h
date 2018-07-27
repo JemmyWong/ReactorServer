@@ -7,6 +7,7 @@
 #define PROJECT_TCPSERVER_H
 
 #include <atomic>
+#include "Slog.h"
 #include "Acceptor.h"
 #include "CommonUtil.h"
 #include "Channel.h"
@@ -16,8 +17,7 @@
 
 class TcpServer {
 public:
-    TcpServer(EventLoop *loop,
-              const std::string name = std::string(), const std::string port = "9000");
+    TcpServer(EventLoop *loop, std::string name = std::string(), std::string port = "9000");
     ~TcpServer();
 
     void setThreadNum(int num);

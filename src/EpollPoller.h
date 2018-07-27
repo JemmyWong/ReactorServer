@@ -15,7 +15,7 @@ class Channel;
 
 class EpollPoller {
 public:
-    EpollPoller(EventLoop *);
+    explicit EpollPoller(EventLoop *);
     EpollPoller(EpollPoller &) = delete;
     ~EpollPoller();
 

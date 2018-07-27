@@ -46,8 +46,8 @@ public:
     void enableWrite()  { events_ |= CWriteEvent; update(); }
     void disableWrite() { events_ &= CWriteEvent; update(); }
     void disableAll()   { events_ = CNoneEvent; update(); }
-    bool isReading()    { return events_ & CReadEvent; }
-    bool isWriting()    { return events_ & CWriteEvent; }
+    bool isReading()    { return static_cast<bool>(events_ & CReadEvent); }
+    bool isWriting()    { return static_cast<bool>(events_ & CWriteEvent); }
     bool isNonEvent()   { return events_ == CNoneEvent; }
 
 private:

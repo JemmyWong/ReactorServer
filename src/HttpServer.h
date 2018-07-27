@@ -10,6 +10,7 @@
 #include <sstream>
 #include <iostream>
 
+#include "Slog.h"
 #include "CommonUtil.h"
 #include "TcpServer.h"
 #include "HttpRequest.h"
@@ -19,7 +20,7 @@ using namespace std::placeholders;
 
 class HttpServer {
 public:
-    HttpServer(EventLoop *loop, const std::string name = std::string(), const std::string port = "9000");
+    HttpServer(EventLoop *loop, std::string name = std::string(), std::string port = "9000");
     ~HttpServer();
 
     void onConnection(const TcpConnectionPtr &conn);

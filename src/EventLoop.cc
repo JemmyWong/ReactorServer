@@ -2,7 +2,7 @@
  * Created by Jemmy on 2018/7/8.
  *
  */
-
+#include "Slog.h"
 #include "EventLoop.h"
 
 const int CPollTimeMs = 10000;
@@ -25,6 +25,7 @@ EventLoop::EventLoop()
           poller_(std::make_shared<EpollPoller>(this))
 {
     printf("...EventLoop()\n");
+    slog_info("EventLoop construct...");
     wakeupChannel_->setReadCB(std::bind(&EventLoop::handleRead, this));
     wakeupChannel_->enableRead();
 }
