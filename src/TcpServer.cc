@@ -53,7 +53,7 @@ void TcpServer::newConnection(int sockFd, const void *addr) {
     char buf[64];
     snprintf(buf, sizeof(buf), "-%s*%d", "9000", nextConnId_++);
     std::string connName = name_ + buf;
-    slog_info("new connction name = %s, next loop[%d]", connName, ioLoop);
+    slog_info("new connction name = %s, next loop[%d]", connName.c_str(), ioLoop);
 
     TcpConnectionPtr conn(new TcpConnection(ioLoop, connName, sockFd));
     connections_[connName] = conn;

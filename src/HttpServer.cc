@@ -51,10 +51,12 @@ void HttpServer::onRequest(const TcpConnectionPtr &conn, const HttpRequest &req)
 
     std::string data = response.toStting();
     data.append(response.getBody());
+    slog_info("Content-Length: %d\n", data.size());
     conn->send(data.c_str(), (int)data.size());
-//    if (response.isCloseConnection()) {
-//        conn->shutdown();
-//    }
+//    conn->shutdown();
+    if (response.isCloseConnection()) {
+        conn->shutdown();
+    }
 }
 
 void HttpServer::defaultHttpCB(const HttpRequest &req, HttpResponse *response) {
@@ -99,7 +101,6 @@ void HttpServer::defaultHttpCB(const HttpRequest &req, HttpResponse *response) {
         std::ifstream file(filePath);
         std::stringstream buf;
         buf << file.rdbuf();
-//        buf << "\0";    // not work
         std::string content(buf.str());
         response->setResponseCode("200");
         response->setResposneMsg(HTTP::ok_200_title);
