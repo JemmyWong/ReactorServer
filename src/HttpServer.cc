@@ -45,16 +45,17 @@ void HttpServer::onRequest(const TcpConnectionPtr &conn, const HttpRequest &req)
     slog_info("trace...");
     std::string connection = req.getHeader("Connection");
     bool close = connection == "close"
-                               ||(req.getVersion() == "HTTP/1.0" && connection != "Keep-Alive");
+                               ||(req.getVersion() == "HTTP/1.0"
+                                                      && connection != "Keep-Alive");
     HttpResponse response(close);
     httpCB_(req, &response);
 
     std::string data = response.toStting();
     data.append(response.getBody());
     conn->send(data.c_str(), (int)data.size());
-//    if (response.isCloseConnection()) {
-//        conn->shutdown();
-//    }
+    if (response.isCloseConnection()) {
+        conn->shutdown();
+    }
 }
 
 void HttpServer::defaultHttpCB(const HttpRequest &req, HttpResponse *response) {
@@ -74,21 +75,21 @@ void HttpServer::defaultHttpCB(const HttpRequest &req, HttpResponse *response) {
             response->setResponseCode("400");
             response->setResposneMsg(HTTP::error_400_title);
             response->setBody(HTTP::error_400_form);
-            response->addHeader("Content-Length", response->getBodySize() + "");
+            response->addHeader("Content-Length", std::to_string(response->getBodySize()));
             return;
         }
         if (!(fileStat.st_mode & S_IROTH)){
             response->setResponseCode("403");
             response->setResposneMsg(HTTP::error_403_title);
             response->setBody(HTTP::error_403_form);
-            response->addHeader("Content-Length", response->getBodySize() + "");
+            response->addHeader("Content-Length", std::to_string(response->getBodySize()));
             return;
         }
         if (S_ISDIR(fileStat.st_mode)) {
             response->setResponseCode("400");
             response->setResposneMsg(HTTP::error_400_title);
             response->setBody(HTTP::error_400_form);
-            response->addHeader("Content-Length", response->getBodySize() + "");
+            response->addHeader("Content-Length", std::to_string(response->getBodySize()));
             return;
         }
 
@@ -99,12 +100,11 @@ void HttpServer::defaultHttpCB(const HttpRequest &req, HttpResponse *response) {
         std::ifstream file(filePath);
         std::stringstream buf;
         buf << file.rdbuf();
-//        buf << "\0";    // not work
         std::string content(buf.str());
         response->setResponseCode("200");
         response->setResposneMsg(HTTP::ok_200_title);
-
         response->setBody(std::move(content));
+        response->addHeader("Content-Length", std::to_string(response->getBodySize()));
     }
 }
 
@@ -143,7 +143,7 @@ void HttpServer::processError(const HttpRequest &req, HttpResponse *response) {
             response->setBody(HTTP::error_404_form);
             break;
     }
-    response->addHeader("Content-Length", response->getBodySize() + "");
+    response->addHeader("Content-Length", std::to_string(response->getBodySize()));
 }
 
 void HttpServer::start() {

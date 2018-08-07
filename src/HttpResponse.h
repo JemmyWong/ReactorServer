@@ -17,7 +17,7 @@ public:
     void setResponseCode(const std::string &code) { responseCode_ = code; }
     void setVersion (const std::string &v) { version_ = v; }
     void setResposneMsg(const std::string &m) { responseMsg_ = m; }
-    void addHeader(const std::string &key, const std::string &value) {
+    void addHeader(const std::string key, const std::string value) {
         headers_[key] = value;
     }
     void addHeaders(const std::map<std::string, std::string> &map) {
