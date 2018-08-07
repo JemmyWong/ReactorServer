@@ -20,7 +20,7 @@ using namespace std::placeholders;
 
 class HttpServer {
 public:
-    HttpServer(EventLoop *loop, std::string name = std::string(), std::string port = "9000");
+    HttpServer(EventLoop *loop, std::string name = std::string("Http"), std::string port = "9000");
     ~HttpServer();
 
     void onConnection(const TcpConnectionPtr &conn);

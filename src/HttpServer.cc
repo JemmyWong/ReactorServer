@@ -52,6 +52,7 @@ void HttpServer::onRequest(const TcpConnectionPtr &conn, const HttpRequest &req)
 
     std::string data = response.toStting();
     data.append(response.getBody());
+    slog_info("Content-Length: %d\n", data.size());
     conn->send(data.c_str(), (int)data.size());
     if (response.isCloseConnection()) {
         conn->shutdown();
