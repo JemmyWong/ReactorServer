@@ -14,11 +14,11 @@ public:
     explicit HttpResponse(bool close);
 
     void setCloseConnection(bool on) { closeConnection_ = on; };
-    void setResponseCode(const std::string &code) { responseCode_ = code; }
-    void setVersion (const std::string &v) { version_ = v; }
-    void setResposneMsg(const std::string &m) { responseMsg_ = m; }
-    void addHeader(const std::string key, const std::string value) {
-        headers_[key] = value;
+    void setResponseCode(const std::string &code) { responseCode_.assign(code); }
+    void setVersion (const std::string &v) { version_.assign(v); }
+    void setResposneMsg(const std::string &m) { responseMsg_.assign(m); }
+    void addHeader(const std::string &key, const std::string &value) {
+        headers_[key].assign(value);
     }
     void addHeaders(const std::map<std::string, std::string> &map) {
         headers_ = map;
@@ -26,7 +26,7 @@ public:
     bool isCloseConnection() { return closeConnection_; }
 
     const std::string toStting();
-    void setBody(const std::string &&str) {
+    void setBody(const std::string &str) {
         body_.assign(str);
     }
     std::string &getBody() {

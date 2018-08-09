@@ -37,7 +37,7 @@ void HttpServer::onMessage(const TcpConnectionPtr &conn, const char *buf, int le
 //    }
     context->parseRequest(buf, len);
     onRequest(conn, context->getRequest());
-    context->reset();
+//    context->reset();
 }
 
 void HttpServer::onRequest(const TcpConnectionPtr &conn, const HttpRequest &req) {
