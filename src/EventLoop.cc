@@ -63,7 +63,7 @@ void EventLoop::loop() {
 
 void EventLoop::doPendingFunctors() {
     std::vector<std::function<void()>> functors;
-    {
+    {   /* good practice: avoid locking critical section for a long time */
         MutexLockGuard lock(mutex_);
         pendingFunctor_.swap(functors);
     }

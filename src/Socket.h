@@ -20,7 +20,7 @@ public:
     int getFd() { return sockFd_; }
 
     /* disable/enable Nagle's algorithm */
-    void setTcpNODelay(bool on);
+    void setTcpNoDelay(bool on);
     void setReuseAddr(bool on);
     void setReusePort(bool on);
     void setKeepAlive(bool on);

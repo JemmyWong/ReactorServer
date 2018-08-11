@@ -48,10 +48,10 @@ Thread::~Thread() {
     }
 }
 
-void* startFunc(void *obj) {
-    ThreadData *data = static_cast<ThreadData *>(obj);
-    data->runInThread();
-    delete data;
+void* threadRoutine(void *obj) {
+    ThreadData *arg = static_cast<ThreadData *>(obj);
+    arg->runInThread();
+    delete arg;
     return NULL;
 }
 
@@ -66,10 +66,10 @@ void Thread::setDefaultName() {
 void Thread::start() {
     assert(!started_);
     started_ = true;
-    ThreadData *data = new ThreadData(func_, name_, &tid_, &latch_);
-    if (pthread_create(&pthread_, NULL, &startFunc, data)) {
+    ThreadData *arg = new ThreadData(func_, name_, &tid_, &latch_);
+    if (pthread_create(&pthread_, NULL, &threadRoutine, arg)) {
         started_ = false;
-        delete data;
+        delete arg;
         printf("Failed in pthread_create\n");
     } else {
         latch_.wait();

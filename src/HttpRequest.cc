@@ -27,6 +27,7 @@ bool HttpRequest::addHeader(const char *begin, const char *colon, const char *en
 }
 
 void HttpRequest::reset() {
+    requestCode_ = NO_REQUEST;
     method_.clear();
     path_.clear();
     query_.clear();

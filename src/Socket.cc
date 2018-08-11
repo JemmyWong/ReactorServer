@@ -27,7 +27,7 @@ void Socket::setReuseAddr(bool on) {
                  &opt, static_cast<socklen_t>(sizeof(opt)));
 }
 
-void Socket::setTcpNODelay(bool on) {
+void Socket::setTcpNoDelay(bool on) {
     int opt = on ? 1 : 0;
     ::setsockopt(sockFd_, IPPROTO_TCP, TCP_NODELAY,
                  &opt, static_cast<socklen_t>(sizeof(opt)));

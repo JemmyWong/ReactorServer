@@ -28,7 +28,7 @@ public:
         readIdx_ = s;
     }
 
-    const HttpRequest getRequest() const { return request_; }
+    const HttpRequest &getRequest() const { return request_; }
 private:
     char * getLine();
     LineStatus parseLine();

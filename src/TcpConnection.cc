@@ -67,13 +67,14 @@ void TcpConnection::sendInLoop(const char *buf, int len) {
 
     /* 2. save data and send it in the next time */
     if (!faultError && n < len) {
-        strcpy(writeBuf_, buf + n);
-        writeIdx_ = len - n;
+        strcpy(writeBuf_ + writeIdx_, buf + n);
+        writeIdx_ += len - n;
         if (!channel_->isWriting()) {
             channel_->enableWrite();
         }
     }
-//    shutdownInLoop();
+    readIdx_ = 0;
+    memset(readBuf_, 0, sizeof(readBuf_));
 }
 
 void TcpConnection::shutdown() {
@@ -95,6 +96,7 @@ void TcpConnection::connectionEstablished() {
     assert(state_ == CConnecting);
     setState(CConnected);
     channel_->tie(shared_from_this());
+    /* add channel to epoll */
     channel_->enableRead();
     printf("%s->%s\n", __FILE__, __func__);
     if (connectionCB_) {
@@ -177,6 +179,8 @@ void TcpConnection::handleWrite() {
                     if (state_ == CDisconnecting) {
                         shutdownInLoop();
                     }
+                    writeIdx_ = 0;
+                    memset(writeBuf_, 0, sizeof(writeBuf_));
                     break;
                 }
             } else {
@@ -206,6 +210,11 @@ void TcpConnection::handleError() {
 
 void TcpConnection::startRead() {
     loop_->runInLoop(std::bind(&TcpConnection::startReadInLoop, this));
+}
+
+void TcpConnection::retrieveAll() {
+    readIdx_ = 0;
+    writeIdx_ = 0;
 }
 
 void TcpConnection::startReadInLoop() {

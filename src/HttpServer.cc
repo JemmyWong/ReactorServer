@@ -16,11 +16,12 @@ HttpServer::HttpServer(EventLoop *loop, const std::string name, const std::strin
 HttpServer::~HttpServer() = default;
 
 void HttpServer::onConnection(const TcpConnectionPtr &conn) {
-    assert(conn->isConnected());
-    std::shared_ptr<HttpContext> context(new HttpContext);
-    conn->setContext(context);
-    printf("%s->%s\n", __FILE__, __func__);
-    slog_info("trace...");
+    if (conn->isConnected()) {
+        std::shared_ptr<HttpContext> context(new HttpContext);
+        conn->setContext(context);
+        printf("%s->%s\n", __FILE__, __func__);
+        slog_info("trace...");
+    }
 }
 
 void HttpServer::onMessage(const TcpConnectionPtr &conn, const char *buf, int len) {
@@ -37,7 +38,7 @@ void HttpServer::onMessage(const TcpConnectionPtr &conn, const char *buf, int le
 //    }
     context->parseRequest(buf, len);
     onRequest(conn, context->getRequest());
-//    context->reset();
+    context->reset();
 }
 
 void HttpServer::onRequest(const TcpConnectionPtr &conn, const HttpRequest &req) {
@@ -45,13 +46,12 @@ void HttpServer::onRequest(const TcpConnectionPtr &conn, const HttpRequest &req)
     slog_info("trace...");
     std::string connection = req.getHeader("Connection");
     bool close = connection == "close"
-                               ||(req.getVersion() == "HTTP/1.0"
-                                                      && connection != "Keep-Alive");
+        ||(req.getVersion() == "HTTP/1.0" && connection != "Keep-Alive");
     HttpResponse response(close);
     httpCB_(req, &response);
 
-    std::string data = response.toStting();
-    data.append(response.getBody());
+    std::string data;
+    response.toString(data);
     slog_info("Content-Length: %d\n", data.size());
     conn->send(data.c_str(), (int)data.size());
     if (response.isCloseConnection()) {
@@ -68,29 +68,31 @@ void HttpServer::defaultHttpCB(const HttpRequest &req, HttpResponse *response) {
     } else {
         response->setVersion(req.getVersion());
         response->addHeader("Server", "47.96.106.37:9000");
-        response->addHeader("Content-Type", "text/html charset=utf-8");
+        std::string path = req.getPath();
+        if (path.find("jpg") != std::string::npos) {
+            response->addHeader("Content-Type", "image/jpeg charset=utf-8");
+        } else {
+            response->addHeader("Content-Type", "text/html charset=utf-8");
+        }
 
         struct stat fileStat;
         std::string filePath = "/root" + req.getPath();
         if (stat(filePath.c_str(), &fileStat) < 0) {
             response->setResponseCode("400");
-            response->setResposneMsg(HTTP::error_400_title);
-            response->setBody(HTTP::error_400_form);
-            response->addHeader("Content-Length", std::to_string(response->getBodySize()));
+            response->setResposneMsg(HTTP::error_404_title);
+            response->setBody(HTTP::error_404_form);
             return;
         }
         if (!(fileStat.st_mode & S_IROTH)){
             response->setResponseCode("403");
             response->setResposneMsg(HTTP::error_403_title);
             response->setBody(HTTP::error_403_form);
-            response->addHeader("Content-Length", std::to_string(response->getBodySize()));
             return;
         }
         if (S_ISDIR(fileStat.st_mode)) {
             response->setResponseCode("400");
             response->setResposneMsg(HTTP::error_400_title);
             response->setBody(HTTP::error_400_form);
-            response->addHeader("Content-Length", std::to_string(response->getBodySize()));
             return;
         }
 
@@ -102,21 +104,22 @@ void HttpServer::defaultHttpCB(const HttpRequest &req, HttpResponse *response) {
         std::stringstream buf;
         buf << file.rdbuf();
         std::string content(buf.str());
+        file.close();
         response->setResponseCode("200");
         response->setResposneMsg(HTTP::ok_200_title);
         response->setBody(std::move(content));
-        response->addHeader("Content-Length", std::to_string(response->getBodySize()));
     }
 }
 
 void HttpServer::processError(const HttpRequest &req, HttpResponse *response) {
     slog_info("trace...");
     printf("%s->%s\n", __FILE__, __func__);
-    HttpCode code = req.getRequestCode();
+    response->setCloseConnection(true);
     response->setVersion(req.getVersion());
     response->addHeader("Server", "47.96.106.37:9000");
     response->addHeader("Content-Type", "text/html charset=utf-8");
 
+    HttpCode code = req.getRequestCode();
     switch (code) {
         case NO_REQUEST:
             response->setResponseCode("400");
@@ -144,7 +147,6 @@ void HttpServer::processError(const HttpRequest &req, HttpResponse *response) {
             response->setBody(HTTP::error_404_form);
             break;
     }
-    response->addHeader("Content-Length", std::to_string(response->getBodySize()));
 }
 
 void HttpServer::start() {

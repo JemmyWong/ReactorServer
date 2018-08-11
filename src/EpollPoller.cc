@@ -24,6 +24,7 @@ void EpollPoller::poll(int ms, std::vector<Channel *> *activeChannels) {
     if (num > 0) {
         slog_info("[%d] ready resource", num);
         fillActiveChannel(num, activeChannels);
+        /* The capacity has been used up, expand double */
         if (static_cast<size_t >(num) == eventVec_.size()) {
             eventVec_.reserve(eventVec_.size() * 2);
         }

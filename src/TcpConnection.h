@@ -16,8 +16,8 @@
 #include <sys/socket.h>
 #include "HttpContext.h"
 
-static const int READ_BUFFER_SIZE = 10240;
-static const int WRITE_BUFFER_SIZE = 40960;
+static const int READ_BUFFER_SIZE = 1024 * 100;         /* 100K */
+static const int WRITE_BUFFER_SIZE = 1024 * 1024 * 10;  /* 10M */
 
 class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
 public:
@@ -72,6 +72,7 @@ private:
     void stopReadInLoop();
     void startReadInLoop();
     void setState(const State &s) { state_ = s; }
+    void retrieveAll();
 
     EventLoop                   *loop_;
     int                         sockFd_;

@@ -16,7 +16,7 @@ public:
     typedef std::function<void()> Functor;
 
     Channel(EventLoop *, int);
-//    Channel(Channel &) = delete; /* non-copyable */
+    Channel(Channel &) = delete; /* non-copyable */
     ~Channel();
 
     /* Tie this channel to the owner object managed by shared_ptr,
