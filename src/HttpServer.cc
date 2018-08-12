@@ -68,10 +68,13 @@ void HttpServer::defaultHttpCB(const HttpRequest &req, HttpResponse *response) {
     } else {
         response->setVersion(req.getVersion());
         response->addHeader("Server", "47.96.106.37:9000");
+
         std::string path = req.getPath();
         if (path.find("jpg") != std::string::npos) {
             response->addHeader("Content-Type", "image/jpeg charset=utf-8");
-        } else {
+        } else if (path.find("pdf") != std::string::npos) {
+            response->addHeader("Content-Type", "application/pdf");
+        } else  {
             response->addHeader("Content-Type", "text/html charset=utf-8");
         }
 

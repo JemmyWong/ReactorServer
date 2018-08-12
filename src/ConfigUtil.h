@@ -1,16 +1,15 @@
 #ifndef _CONFIGUTIL_H_
 #define _CONFIGUTIL_H_
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <string>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
+#include <cstring>
 #include <map>
 #include <pthread.h>
 
-/*
-char configPath[255] = "../config.ini";
-*/
+#include "Slog.h"
+#include "Singleton.h"
 
 using namespace std;
 
@@ -18,14 +17,14 @@ int get_config(char *file, char *key, char *value);
 
 class ConfigFile {
 public:
-    void init(string fileName);
-    static void initKeyValue();
-    string getValue(string key);
-    int setValue(string key, string value);
+    ConfigFile() = default;
+    ConfigFile(ConfigFile &) = delete;
+
+    void init(const string &path);
+    const string &getValue(const string &key);
+    void setValue(const string &key, const string &value);
 private:
-    string fileName;
-    std::map<string, string> confMap;
-    static pthread_once_t ponce;
+    std::map<string, string> confMap_;
 };
 
 #endif

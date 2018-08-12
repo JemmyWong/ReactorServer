@@ -31,7 +31,7 @@ int get_config(char *file, char *key, char *value) {
     char left[255], right[255], line[255];
     char *fs, *fe, *equal, *bs,*be, *ite;
 
-    while (fgets(line, 255, fd) != NULL) {
+    while (fgets(line, 255, fd) != nullptr) {
         ite = line;
         equal = strchr(line, '=');
 
@@ -63,15 +63,58 @@ int get_config(char *file, char *key, char *value) {
     return find;
 }
 
-pthread_once_t ConfigFile::ponce = PTHREAD_ONCE_INIT;
-
-void ConfigFile::init(string fileName_) {
-    if (fileName.empty()) {
-        fileName = std::move(fileName_);
+void ConfigFile::init(const string &path_) {
+    string path;
+    if (path.find("/") == string::npos) {
+        path.assign("/root/" + path);
     }
-    pthread_once(&ponce, &ConfigFile::initKeyValue);
+
+    FILE *fd = fopen(path.c_str(), "r");
+    if (!fd) {
+        fprintf(stderr, "open config.conf error: %s\n", strerror(errno));
+        slog_error("open config.conf error: %s\n", strerror(errno));
+        exit(1);
+    }
+    /* clean old data */
+    confMap_.clear();
+    char line[255];
+    char *fs, *fe, *equal, *bs,*be, *ite;
+
+    while (fgets(line, 255, fd) != nullptr) {
+        ite = line;
+        equal = strchr(line, '=');
+        if (!equal) continue;
+
+        // find key
+        while (isblank(*ite)) ++ite;
+        fs = ite;
+        if (*fs == '#') continue;
+        while (!isblank(*ite) && (ite != equal)) ++ite;
+        fe = ite;
+
+        // get value
+        ite = equal + 1;
+        while (isblank(*ite)) ++ite;
+        bs = ite;
+        while (!isblank(*ite) && *ite != '\0') ++ite;
+        be = ite;
+        string key = string(fs, fe-fs);
+        string value = string(bs, be-bs);
+        if (!key.empty() && !value.empty()) {
+            confMap_.insert(make_pair(key, value));
+        }
+    }
+
+    fclose(fd);
 }
 
-void ConfigFile::initKeyValue() {
-
+const string &ConfigFile::getValue(const string &key) {
+    return confMap_[key];
 }
+
+void ConfigFile::setValue(const string &key, const string &value) {
+    confMap_[key] = value;
+}
+
+/* global variable */
+ConfigFile &config = Singleton<ConfigFile>::instance();
