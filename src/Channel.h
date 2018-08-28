@@ -30,11 +30,11 @@ public:
     void setErrorCB(const Functor &func) { errorCB_ = func; }
     void setCloseCB(const Functor &func) { closeCB_ = func; }
 
-    int setIndex(int idx) { index_ = idx; }
+    int setStatus(int idx) { status_ = idx; }
     int setEvents(int e) { rcvEvents_ = e; }
 
     int getFd() {return fd_; }
-    int getIndex() { return index_; }
+    int getStatus() { return status_; }
     int getEvents() { return events_; }
 
     void dontLogHup() { logHup_ = false; }
@@ -55,9 +55,9 @@ private:
 
     EventLoop           *loop_;
     const int           fd_;
-    int                 index_;     /* status: CNew, CAdded, CDeleted */
-    int                 events_;
-    int                 rcvEvents_; /* recive events: EPOLLIN, EPOLLOUT, EPOLLHUP*/
+    int                 status_;    /* status: CNew, CAdded, CDeleted */
+    int                 events_;    /* registered events: EPOLLIN, EPOLLOUT, EPOLLHUP */
+    int                 rcvEvents_; /* recive events: EPOLLIN, EPOLLOUT, EPOLLHUP */
     std::weak_ptr<void> tie_;
 
     bool tied_;
