@@ -12,7 +12,7 @@ const int Channel::CWriteEvent = EPOLLOUT;
 Channel::Channel(EventLoop *loop, int fd)
         : loop_(loop),
           fd_(fd),
-          index_(-1),
+          status_(-1),
           events_(0),
           rcvEvents_(0),
           tied_(false),

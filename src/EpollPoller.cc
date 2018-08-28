@@ -53,7 +53,7 @@ void EpollPoller::fillActiveChannel(int num, std::vector<Channel *> *activeChann
 
 
 void EpollPoller::updateChannel(Channel *channel) {
-    int index = channel->getIndex();
+    int index = channel->getStatus();
     int fd = channel->getFd();
     if (index == CNew || index == CDeleted) {
         if (index == CNew) {
@@ -63,15 +63,15 @@ void EpollPoller::updateChannel(Channel *channel) {
             assert(channels_.find(fd) != channels_.end());
             assert(channels_[fd] == channel);
         }
-        channel->setIndex(CAdded);
+        channel->setStatus(CAdded);
         update(EPOLL_CTL_ADD, channel);
     } else {
         assert(channels_.find(fd) != channels_.end());
         assert(channels_[fd] = channel);
-        assert(channel->getIndex() == CAdded);
+        assert(channel->getStatus() == CAdded);
         if (channel->isNonEvent()) {
             update(EPOLL_CTL_DEL, channel);
-            channel->setIndex(CDeleted);
+            channel->setStatus(CDeleted);
         } else {
             update(EPOLL_CTL_MOD, channel);
         }
@@ -82,7 +82,7 @@ void EpollPoller::updateChannel(Channel *channel) {
 
 void EpollPoller::removeChannel(Channel *channel) {
     int fd = channel->getFd();
-    int index = channel->getIndex();
+    int index = channel->getStatus();
     assert(ownerLoop_->isInLoopThread());
     assert(channel->isNonEvent());
     assert(channels_.find(fd) != channels_.end());
@@ -94,7 +94,7 @@ void EpollPoller::removeChannel(Channel *channel) {
     if (index == CAdded) {
         update(EPOLL_CTL_DEL, channel);
     }
-    channel->setIndex(CNew);
+    channel->setStatus(CNew);
 }
 
 void EpollPoller::update(int op, Channel *channel) {
