@@ -48,7 +48,7 @@ HttpCode HttpContext::parseRequest(const char *buf, int len) {
     HttpCode    code = NO_REQUEST;
     char *text = nullptr;
     int le = 0;
-    while (((checkState_ == CHECK_STATE_CONTENT) && state == LINE_OK)
+    while (((checkState_ == CHECK_STATE_CONTENT) && (state == LINE_OK))
             || (state = parseLine()) == LINE_OK) {
         text = getLine();
         le = checkedIdx_ - startLine_ - 2;

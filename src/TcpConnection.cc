@@ -185,7 +185,6 @@ void TcpConnection::handleWrite() {
                 }
             } else {
                 handleClose();
-                return;
             }
         }
     }

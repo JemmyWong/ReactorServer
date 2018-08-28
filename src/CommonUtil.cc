@@ -9,6 +9,7 @@ void daemon() {
     int pid = fork();
     if (pid < 0) {
         printf("daemon fork error: %s\n", strerror(errno));
+        exit(1);
     } else if (pid > 0) {
         exit(0);
     }
