@@ -10,6 +10,7 @@
 #include <vector>
 #include <memory>
 #include <cerrno>
+#include <algorithm>
 #include <pthread.h>
 #include <functional>
 #include <sys/epoll.h>
